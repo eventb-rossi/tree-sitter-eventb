@@ -1,0 +1,172 @@
+================================================================================
+hyphenated component names (Rodin file names)
+================================================================================
+
+CONTEXT ENV_C-1
+END
+
+MACHINE F-ALGOPC
+REFINES
+    E-ALGO
+SEES
+    A-C0 ENV_C-1
+END
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (component_name
+      (identifier)))
+  (machine
+    name: (component_name
+      (identifier))
+    (refines_clause
+      target: (component_name
+        (identifier)))
+    (sees_clause
+      (component_name
+        (identifier))
+      (component_name
+        (identifier)))))
+
+================================================================================
+Union and Inter as plain identifiers; union(S) as application
+================================================================================
+
+context C
+  axioms
+    @a Root ∈ Union
+    @b finite(Union)
+    @c x = union(S)
+    @d INTERVAL ⊆ Inter
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (identifier)))
+      (axiom
+        label: (label)
+        predicate: (function_application
+          function: (builtin)
+          argument: (identifier)))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (function_application
+            function: (identifier)
+            argument: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (identifier))))))
+
+================================================================================
+set extension applied as a function (Rodin-emitted)
+================================================================================
+
+machine M
+  events
+    event e
+      then
+        @act1 lamp ≔ {TRUE ↦ on, FALSE ↦ off}(bool(x ∈ S))
+        @act2 d ≔ {UP ↦ 1, DOWN ↦ −(1)}(dir(l))
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    name: (identifier)
+    (events_clause
+      (event
+        name: (identifier)
+        (then_clause
+          (action
+            label: (label)
+            (assignment
+              left: (identifier)
+              right: (function_application
+                function: (set_enumeration
+                  (binary_expression
+                    left: (true)
+                    right: (identifier))
+                  (binary_expression
+                    left: (false)
+                    right: (identifier)))
+                argument: (bool_conversion
+                  predicate: (comparison_predicate
+                    left: (identifier)
+                    right: (identifier))))))
+          (action
+            label: (label)
+            (assignment
+              left: (identifier)
+              right: (function_application
+                function: (set_enumeration
+                  (binary_expression
+                    left: (identifier)
+                    right: (number))
+                  (binary_expression
+                    left: (identifier)
+                    right: (unary_expression
+                      operand: (parenthesized_expression
+                        (number)))))
+                argument: (function_application
+                  function: (identifier)
+                  argument: (identifier))))))))))
+
+================================================================================
+quantified union over expressions (from aman_v7)
+================================================================================
+
+context C
+  axioms
+    @a S = ⋃t · t ∈ T | f[{t}]
+    @b R = UNION p · p ∈ Q | g(p)
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (quantified_union
+            binder: (typed_identifier
+              name: (identifier))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (identifier))
+            body: (relational_image
+              relation: (identifier)
+              image: (set_enumeration
+                (identifier))))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (quantified_union
+            binder: (typed_identifier
+              name: (identifier))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (identifier))
+            body: (function_application
+              function: (identifier)
+              argument: (identifier))))))))

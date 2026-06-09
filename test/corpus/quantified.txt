@@ -270,13 +270,15 @@ end
         label: (label)
         predicate: (comparison_predicate
           left: (identifier)
-          right: (generalized_union
+          right: (function_application
+            function: (identifier)
             argument: (identifier))))
       (axiom
         label: (label)
         predicate: (comparison_predicate
           left: (identifier)
-          right: (generalized_inter
+          right: (function_application
+            function: (identifier)
             argument: (set_enumeration
               (identifier)
               (identifier))))))))
