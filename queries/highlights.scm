@@ -130,10 +130,13 @@
 (context name: (identifier) @module)
 (machine name: (identifier) @module)
 (refines_clause target: (identifier) @module)
+(component_name (identifier) @module)
 (set_declaration name: (identifier) @type)
 (event name: (identifier) @function)
 (event refines: (identifier) @function)
 (event extends: (identifier) @function)
+(any_clause parameter: (identifier) @variable.parameter)
+(typed_identifier name: (identifier) @variable.parameter)
 
 (comment) @comment
 (string) @string

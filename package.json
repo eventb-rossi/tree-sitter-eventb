@@ -1,7 +1,7 @@
 {
   "name": "tree-sitter-eventb",
   "version": "0.1.0",
-  "description": "Event-B lexical grammar for tree-sitter (Rossi)",
+  "description": "Event-B grammar for tree-sitter (Rossi)",
   "repository": "https://github.com/eventb-rossi/tree-sitter-eventb",
   "license": "MIT OR Apache-2.0",
   "type": "module",
