@@ -121,10 +121,19 @@ export default grammar({
     context: ($) =>
       seq(
         kw('context'),
-        field('name', $.identifier),
+        field('name', $._component_name),
         repeat($._context_clause),
         kw('end'),
       ),
+
+    // Component names are Rodin file names, which may contain hyphens
+    // (ENV_C-1). The hyphen parts attach with token.immediate so a name is
+    // distinguished from subtraction; in name positions no expression is
+    // valid anyway.
+    _component_name: ($) => choice($.identifier, $.component_name),
+
+    component_name: ($) =>
+      seq($.identifier, repeat1(token.immediate(/-[a-zA-Z0-9_']+/))),
 
     _context_clause: ($) =>
       choice(
@@ -135,7 +144,7 @@ export default grammar({
         $.theorems_clause,
       ),
 
-    extends_clause: ($) => seq(kw('extends'), spaceSep1($.identifier)),
+    extends_clause: ($) => seq(kw('extends'), spaceSep1($._component_name)),
 
     sets_clause: ($) => seq(kw('sets'), spaceSep1($.set_declaration)),
 
@@ -164,7 +173,7 @@ export default grammar({
     machine: ($) =>
       seq(
         kw('machine'),
-        field('name', $.identifier),
+        field('name', $._component_name),
         repeat($._machine_clause),
         kw('end'),
       ),
@@ -180,9 +189,10 @@ export default grammar({
         $.events_clause,
       ),
 
-    refines_clause: ($) => seq(kw('refines'), field('target', $.identifier)),
+    refines_clause: ($) =>
+      seq(kw('refines'), field('target', $._component_name)),
 
-    sees_clause: ($) => seq(kw('sees'), spaceSep1($.identifier)),
+    sees_clause: ($) => seq(kw('sees'), spaceSep1($._component_name)),
 
     variables_clause: ($) => seq(kw('variables'), spaceSep1($.identifier)),
 
@@ -431,10 +441,20 @@ export default grammar({
         $.lambda_expression,
         $.quantified_union,
         $.quantified_inter,
-        $.generalized_union,
-        $.generalized_inter,
         $.bool_conversion,
         $.if_expression,
+        $._identifier_like,
+      ),
+
+    // `union` and `inter` are operators only when a quantified form follows;
+    // otherwise they are ordinary identifiers, like in rossi, where the PEG
+    // backtracks (the generalized union of kernel_lang, union(S), is an
+    // identifier application there too). Capitalised spellings like `Union`
+    // are real identifiers in published models.
+    _identifier_like: ($) =>
+      choice(
+        alias(ci('union'), $.identifier),
+        alias(ci('inter'), $.identifier),
       ),
 
     binary_expression: ($) => {
@@ -540,12 +560,15 @@ export default grammar({
             'function',
             choice(
               $.identifier,
+              $._identifier_like,
               $.builtin,
               $.function_application,
               $.function_override,
               $.parenthesized_expression,
               $.inverse_expression,
               $.relational_image,
+              $.set_enumeration,
+              $.set_comprehension,
             ),
           ),
           '{',
@@ -675,23 +698,6 @@ export default grammar({
         ),
       ),
 
-    // Generalized union/inter of a set of sets: union(S), inter(S).
-    generalized_union: ($) =>
-      seq(
-        choice('⋃', alias(ci('union'), '⋃')),
-        '(',
-        field('argument', $._expression),
-        ')',
-      ),
-
-    generalized_inter: ($) =>
-      seq(
-        choice('⋂', alias(ci('inter'), '⋂')),
-        '(',
-        field('argument', $._expression),
-        ')',
-      ),
-
     // bool(P) converts a predicate to a BOOL value.
     bool_conversion: ($) =>
       seq(
@@ -717,7 +723,8 @@ export default grammar({
     _pipe: ($) => choice('∣', alias('|', '∣')),
 
     // The function position is an atom or another postfix expression, not an
-    // arbitrary expression: f(x), prj1(s)(t), (E)(x), f∼(x), r[S](x).
+    // arbitrary expression: f(x), prj1(s)(t), (E)(x), f∼(x), r[S](x), and
+    // Rodin-emitted set extensions like {TRUE ↦ a, FALSE ↦ b}(x).
     function_application: ($) =>
       prec.left(
         EXPR.postfix,
@@ -726,11 +733,15 @@ export default grammar({
             'function',
             choice(
               $.identifier,
+              $._identifier_like,
               $.builtin,
               $.function_application,
+              $.function_override,
               $.parenthesized_expression,
               $.inverse_expression,
               $.relational_image,
+              $.set_enumeration,
+              $.set_comprehension,
             ),
           ),
           '(',
