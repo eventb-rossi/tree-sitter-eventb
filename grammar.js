@@ -581,7 +581,9 @@ export default grammar({
     // Set constructors and quantified expressions
     // ==========================
 
-    set_enumeration: ($) => seq('{', commaSep1($._expression), '}'),
+    // `{}` without inner space lexes as the empty_set token; `{ }` parses
+    // here as an empty enumeration, like rossi.
+    set_enumeration: ($) => seq('{', optional(commaSep1($._expression)), '}'),
 
     // Three forms (kernel_lang §3.3.6, rossi grammar.pest):
     //   {x, y · P | E}   extended (explicit binders)
@@ -784,6 +786,8 @@ export default grammar({
     // ==========================
 
     identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_']*/,
+    // Unsigned, unlike rossi's signed integer literal: a leading minus parses
+    // as unary minus, so `x-1` cannot lex as `x` `(-1)`.
     number: ($) => /[0-9]+/,
     // Per the TextEditor EBNF: all characters following `@` belong to the
     // label until the next whitespace character.
