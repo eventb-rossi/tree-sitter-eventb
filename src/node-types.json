@@ -1,5 +1,193 @@
 [
   {
+    "type": "action",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "label",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "assignment",
+          "named": true
+        },
+        {
+          "type": "becomes_member",
+          "named": true
+        },
+        {
+          "type": "becomes_such",
+          "named": true
+        },
+        {
+          "type": "skip",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "any_clause",
+    "named": true,
+    "fields": {
+      "parameter": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "assignment",
+    "named": true,
+    "fields": {
+      "left": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "right": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "bool_conversion",
+            "named": true
+          },
+          {
+            "type": "bool_set",
+            "named": true
+          },
+          {
+            "type": "builtin",
+            "named": true
+          },
+          {
+            "type": "empty_set",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "function_override",
+            "named": true
+          },
+          {
+            "type": "generalized_inter",
+            "named": true
+          },
+          {
+            "type": "generalized_union",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "if_expression",
+            "named": true
+          },
+          {
+            "type": "integer_set",
+            "named": true
+          },
+          {
+            "type": "inverse_expression",
+            "named": true
+          },
+          {
+            "type": "lambda_expression",
+            "named": true
+          },
+          {
+            "type": "natural1_set",
+            "named": true
+          },
+          {
+            "type": "natural_set",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "quantified_inter",
+            "named": true
+          },
+          {
+            "type": "quantified_union",
+            "named": true
+          },
+          {
+            "type": "relational_image",
+            "named": true
+          },
+          {
+            "type": "set_comprehension",
+            "named": true
+          },
+          {
+            "type": "set_enumeration",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "axiom",
     "named": true,
     "fields": {
@@ -66,6 +254,190 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "becomes_member",
+    "named": true,
+    "fields": {
+      "left": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "right": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "bool_conversion",
+            "named": true
+          },
+          {
+            "type": "bool_set",
+            "named": true
+          },
+          {
+            "type": "builtin",
+            "named": true
+          },
+          {
+            "type": "empty_set",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "function_override",
+            "named": true
+          },
+          {
+            "type": "generalized_inter",
+            "named": true
+          },
+          {
+            "type": "generalized_union",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "if_expression",
+            "named": true
+          },
+          {
+            "type": "integer_set",
+            "named": true
+          },
+          {
+            "type": "inverse_expression",
+            "named": true
+          },
+          {
+            "type": "lambda_expression",
+            "named": true
+          },
+          {
+            "type": "natural1_set",
+            "named": true
+          },
+          {
+            "type": "natural_set",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "quantified_inter",
+            "named": true
+          },
+          {
+            "type": "quantified_union",
+            "named": true
+          },
+          {
+            "type": "relational_image",
+            "named": true
+          },
+          {
+            "type": "set_comprehension",
+            "named": true
+          },
+          {
+            "type": "set_enumeration",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "becomes_such",
+    "named": true,
+    "fields": {
+      "left": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "predicate": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_predicate",
+            "named": true
+          },
+          {
+            "type": "comparison_predicate",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "not_predicate",
+            "named": true
+          },
+          {
+            "type": "parenthesized_predicate",
+            "named": true
+          },
+          {
+            "type": "quantified_predicate",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -939,6 +1311,105 @@
     }
   },
   {
+    "type": "event",
+    "named": true,
+    "fields": {
+      "convergence": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "anticipated",
+            "named": false
+          },
+          {
+            "type": "convergent",
+            "named": false
+          },
+          {
+            "type": "ordinary",
+            "named": false
+          }
+        ]
+      },
+      "extends": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "refines": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "any_clause",
+          "named": true
+        },
+        {
+          "type": "status_clause",
+          "named": true
+        },
+        {
+          "type": "then_clause",
+          "named": true
+        },
+        {
+          "type": "where_clause",
+          "named": true
+        },
+        {
+          "type": "with_clause",
+          "named": true
+        },
+        {
+          "type": "witness_clause",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "events_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "event",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "extends_clause",
     "named": true,
     "fields": {},
@@ -1491,6 +1962,60 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "guard",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "label",
+            "named": true
+          }
+        ]
+      },
+      "predicate": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_predicate",
+            "named": true
+          },
+          {
+            "type": "comparison_predicate",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "not_predicate",
+            "named": true
+          },
+          {
+            "type": "parenthesized_predicate",
+            "named": true
+          },
+          {
+            "type": "quantified_predicate",
+            "named": true
+          },
+          {
+            "type": "true",
             "named": true
           }
         ]
@@ -2158,6 +2683,10 @@
       "required": false,
       "types": [
         {
+          "type": "events_clause",
+          "named": true
+        },
+        {
           "type": "invariants_clause",
           "named": true
         },
@@ -2175,6 +2704,10 @@
         },
         {
           "type": "variables_clause",
+          "named": true
+        },
+        {
+          "type": "variant_clause",
           "named": true
         }
       ]
@@ -3547,6 +4080,45 @@
     }
   },
   {
+    "type": "status_clause",
+    "named": true,
+    "fields": {
+      "convergence": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "anticipated",
+            "named": false
+          },
+          {
+            "type": "convergent",
+            "named": false
+          },
+          {
+            "type": "ordinary",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "then_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "action",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "theorem",
     "named": true,
     "fields": {
@@ -3907,6 +4479,225 @@
     }
   },
   {
+    "type": "variant_clause",
+    "named": true,
+    "fields": {
+      "expression": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "bool_conversion",
+            "named": true
+          },
+          {
+            "type": "bool_set",
+            "named": true
+          },
+          {
+            "type": "builtin",
+            "named": true
+          },
+          {
+            "type": "empty_set",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "function_override",
+            "named": true
+          },
+          {
+            "type": "generalized_inter",
+            "named": true
+          },
+          {
+            "type": "generalized_union",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "if_expression",
+            "named": true
+          },
+          {
+            "type": "integer_set",
+            "named": true
+          },
+          {
+            "type": "inverse_expression",
+            "named": true
+          },
+          {
+            "type": "lambda_expression",
+            "named": true
+          },
+          {
+            "type": "natural1_set",
+            "named": true
+          },
+          {
+            "type": "natural_set",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "quantified_inter",
+            "named": true
+          },
+          {
+            "type": "quantified_union",
+            "named": true
+          },
+          {
+            "type": "relational_image",
+            "named": true
+          },
+          {
+            "type": "set_comprehension",
+            "named": true
+          },
+          {
+            "type": "set_enumeration",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "where_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "guard",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "with_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "witness",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "witness",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "label",
+            "named": true
+          }
+        ]
+      },
+      "predicate": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_predicate",
+            "named": true
+          },
+          {
+            "type": "comparison_predicate",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "not_predicate",
+            "named": true
+          },
+          {
+            "type": "parenthesized_predicate",
+            "named": true
+          },
+          {
+            "type": "quantified_predicate",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "witness_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "witness",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "(",
     "named": false
   },
@@ -3920,6 +4711,14 @@
   },
   {
     "type": ",",
+    "named": false
+  },
+  {
+    "type": ":∈",
+    "named": false
+  },
+  {
+    "type": ":∣",
     "named": false
   },
   {
@@ -3963,7 +4762,19 @@
     "named": false
   },
   {
+    "type": "anticipated",
+    "named": false
+  },
+  {
+    "type": "any",
+    "named": false
+  },
+  {
     "type": "axioms",
+    "named": false
+  },
+  {
+    "type": "begin",
     "named": false
   },
   {
@@ -3988,6 +4799,10 @@
     "named": false
   },
   {
+    "type": "convergent",
+    "named": false
+  },
+  {
     "type": "dom",
     "named": false
   },
@@ -4001,6 +4816,14 @@
   },
   {
     "type": "end",
+    "named": false
+  },
+  {
+    "type": "event",
+    "named": false
+  },
+  {
+    "type": "events",
     "named": false
   },
   {
@@ -4052,6 +4875,10 @@
     "named": true
   },
   {
+    "type": "ordinary",
+    "named": false
+  },
+  {
     "type": "ran",
     "named": false
   },
@@ -4065,6 +4892,14 @@
   },
   {
     "type": "sets",
+    "named": false
+  },
+  {
+    "type": "skip",
+    "named": true
+  },
+  {
+    "type": "status",
     "named": false
   },
   {
@@ -4089,6 +4924,26 @@
   },
   {
     "type": "variables",
+    "named": false
+  },
+  {
+    "type": "variant",
+    "named": false
+  },
+  {
+    "type": "when",
+    "named": false
+  },
+  {
+    "type": "where",
+    "named": false
+  },
+  {
+    "type": "with",
+    "named": false
+  },
+  {
+    "type": "witness",
     "named": false
   },
   {
@@ -4221,6 +5076,10 @@
   },
   {
     "type": "∼",
+    "named": false
+  },
+  {
+    "type": "≔",
     "named": false
   },
   {

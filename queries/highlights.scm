@@ -26,7 +26,22 @@
   "if"
   "then"
   "else"
+  "variant"
+  "events"
+  "event"
+  "any"
+  "where"
+  "when"
+  "with"
+  "witness"
+  "begin"
+  "status"
+  "ordinary"
+  "convergent"
+  "anticipated"
 ] @keyword
+
+(skip) @keyword
 
 [
   "∀"
@@ -91,6 +106,9 @@
   "⋃"
   "⋂"
   "∣"
+  "≔"
+  ":∈"
+  ":∣"
 ] @operator
 
 "bool" @function.builtin
@@ -113,6 +131,9 @@
 (machine name: (identifier) @module)
 (refines_clause target: (identifier) @module)
 (set_declaration name: (identifier) @type)
+(event name: (identifier) @function)
+(event refines: (identifier) @function)
+(event extends: (identifier) @function)
 
 (comment) @comment
 (string) @string

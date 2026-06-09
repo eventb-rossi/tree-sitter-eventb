@@ -106,6 +106,9 @@ export default grammar({
     // `bool` followed by `(` is a predicate-to-BOOL conversion, but `bool`
     // is also the BOOL type literal.
     [$.bool_conversion, $.bool_set],
+    // An action's identifier list is shared by all three assignment forms
+    // until the operator (≔, :∈, :∣) decides among them.
+    [$.assignment, $.becomes_member, $.becomes_such],
   ],
 
   rules: {
@@ -173,6 +176,8 @@ export default grammar({
         $.variables_clause,
         $.invariants_clause,
         $.theorems_clause,
+        $.variant_clause,
+        $.events_clause,
       ),
 
     refines_clause: ($) => seq(kw('refines'), field('target', $.identifier)),
@@ -183,6 +188,106 @@ export default grammar({
 
     invariants_clause: ($) =>
       seq(kw('invariants'), repeat1(alias($.labeled_predicate, $.invariant))),
+
+    variant_clause: ($) =>
+      seq(kw('variant'), field('expression', $._expression)),
+
+    // ==========================
+    // Events
+    // ==========================
+
+    events_clause: ($) => seq(kw('events'), repeat1($.event)),
+
+    // The INITIALISATION event needs no special rule: its name parses as a
+    // plain identifier (there is no `initialisation` keyword token to shadow
+    // it).
+    event: ($) =>
+      seq(
+        optional(field('convergence', $._convergence)),
+        kw('event'),
+        field('name', $.identifier),
+        optional(
+          choice(
+            seq(kw('refines'), field('refines', $.identifier)),
+            seq(kw('extends'), field('extends', $.identifier)),
+          ),
+        ),
+        repeat($._event_clause),
+        kw('end'),
+      ),
+
+    _convergence: ($) =>
+      choice(kw('ordinary'), kw('convergent'), kw('anticipated')),
+
+    _event_clause: ($) =>
+      choice(
+        $.status_clause,
+        $.any_clause,
+        $.where_clause,
+        $.with_clause,
+        $.witness_clause,
+        $.then_clause,
+      ),
+
+    status_clause: ($) =>
+      seq(kw('status'), field('convergence', $._convergence)),
+
+    any_clause: ($) =>
+      seq(kw('any'), spaceSep1(field('parameter', $.identifier))),
+
+    where_clause: ($) =>
+      seq(
+        choice(kw('where'), kw('when')),
+        repeat1(alias($.labeled_predicate, $.guard)),
+      ),
+
+    // WITH gives witnesses for refined variables, WITNESS for abstract
+    // parameters; both hold labeled predicates.
+    with_clause: ($) =>
+      seq(kw('with'), repeat1(alias($.labeled_predicate, $.witness))),
+
+    witness_clause: ($) =>
+      seq(kw('witness'), repeat1(alias($.labeled_predicate, $.witness))),
+
+    then_clause: ($) =>
+      seq(choice(kw('then'), kw('begin')), repeat1($.action)),
+
+    // ==========================
+    // Actions
+    // ==========================
+
+    action: ($) =>
+      seq(
+        optional(field('label', $.label)),
+        choice($.skip, $.assignment, $.becomes_member, $.becomes_such),
+      ),
+
+    skip: ($) => token(ci('skip')),
+
+    // Deterministic (parallel) assignment x, y ≔ E, F and functional
+    // override f(x) ≔ E.
+    assignment: ($) =>
+      seq(
+        commaSep1(field('left', choice($.identifier, $.function_application))),
+        choice('≔', alias(':=', '≔')),
+        commaSep1(field('right', $._expression)),
+      ),
+
+    // Non-deterministic: becomes member of a set.
+    becomes_member: ($) =>
+      seq(
+        commaSep1(field('left', $.identifier)),
+        choice(':∈', alias('::', ':∈')),
+        field('right', $._expression),
+      ),
+
+    // Non-deterministic: becomes such that a predicate holds.
+    becomes_such: ($) =>
+      seq(
+        commaSep1(field('left', $.identifier)),
+        choice(':∣', alias(':|', ':∣')),
+        field('predicate', $._predicate),
+      ),
 
     // ==========================
     // Labeled predicates
