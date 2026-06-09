@@ -170,3 +170,24 @@ end
             body: (function_application
               function: (identifier)
               argument: (identifier))))))))
+
+================================================================================
+empty enumeration with inner whitespace
+================================================================================
+
+context C
+  axioms
+    @a S = { }
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (set_enumeration))))))
