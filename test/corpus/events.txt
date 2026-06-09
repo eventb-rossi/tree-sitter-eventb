@@ -1,0 +1,344 @@
+================================================================================
+machine with initialisation and a simple event
+================================================================================
+
+machine M
+  variables c
+  events
+    event INITIALISATION
+      then
+        @act1 c ≔ 0
+    end
+
+    event inc
+      then
+        @act1 c ≔ c + 1
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    name: (identifier)
+    (variables_clause
+      (identifier))
+    (events_clause
+      (event
+        name: (identifier)
+        (then_clause
+          (action
+            label: (label)
+            (assignment
+              left: (identifier)
+              right: (number)))))
+      (event
+        name: (identifier)
+        (then_clause
+          (action
+            label: (label)
+            (assignment
+              left: (identifier)
+              right: (binary_expression
+                left: (identifier)
+                right: (number)))))))))
+
+================================================================================
+event parameters and guards
+================================================================================
+
+machine M
+  events
+    event found
+      any e f
+      where
+        @grd1 e ∈ dom(g)
+        @grd2 theorem g(e) = v
+      then
+        @act1 r ≔ e
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    name: (identifier)
+    (events_clause
+      (event
+        name: (identifier)
+        (any_clause
+          parameter: (identifier)
+          parameter: (identifier))
+        (where_clause
+          (guard
+            label: (label)
+            predicate: (comparison_predicate
+              left: (identifier)
+              right: (unary_expression
+                operand: (parenthesized_expression
+                  (identifier)))))
+          (guard
+            label: (label)
+            predicate: (comparison_predicate
+              left: (function_application
+                function: (identifier)
+                argument: (identifier))
+              right: (identifier))))
+        (then_clause
+          (action
+            label: (label)
+            (assignment
+              left: (identifier)
+              right: (identifier))))))))
+
+================================================================================
+when/begin spellings and skip
+================================================================================
+
+machine M
+  events
+    event tick
+      when
+        @grd1 x > 0
+      begin
+        @act1 skip
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    name: (identifier)
+    (events_clause
+      (event
+        name: (identifier)
+        (where_clause
+          (guard
+            label: (label)
+            predicate: (comparison_predicate
+              left: (identifier)
+              right: (number))))
+        (then_clause
+          (action
+            label: (label)
+            (skip)))))))
+
+================================================================================
+refinement: event refines/extends, witnesses, status
+================================================================================
+
+machine M1
+  refines M0
+  events
+    convergent event step refines step
+      status convergent
+      any y
+      where
+        @grd1 y ∈ S
+      with
+        @x x = y + 1
+      witness
+        @w w ∈ T
+      then
+        @act1 v ≔ y
+    end
+
+    event copy extends copy
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    name: (identifier)
+    (refines_clause
+      target: (identifier))
+    (events_clause
+      (event
+        name: (identifier)
+        refines: (identifier)
+        (status_clause)
+        (any_clause
+          parameter: (identifier))
+        (where_clause
+          (guard
+            label: (label)
+            predicate: (comparison_predicate
+              left: (identifier)
+              right: (identifier))))
+        (with_clause
+          (witness
+            label: (label)
+            predicate: (comparison_predicate
+              left: (identifier)
+              right: (binary_expression
+                left: (identifier)
+                right: (number)))))
+        (witness_clause
+          (witness
+            label: (label)
+            predicate: (comparison_predicate
+              left: (identifier)
+              right: (identifier))))
+        (then_clause
+          (action
+            label: (label)
+            (assignment
+              left: (identifier)
+              right: (identifier)))))
+      (event
+        name: (identifier)
+        extends: (identifier)))))
+
+================================================================================
+action forms: parallel assignment, becomes-member, becomes-such, override
+================================================================================
+
+machine M
+  events
+    event act
+      then
+        @a1 x, y ≔ y, x
+        @a2 z :∈ S ∖ {x}
+        @a3 w :∣ w' > w
+        @a4 f(i) ≔ v
+        @a5 u :: T
+        @a6 t :| t' ∈ U
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    name: (identifier)
+    (events_clause
+      (event
+        name: (identifier)
+        (then_clause
+          (action
+            label: (label)
+            (assignment
+              left: (identifier)
+              left: (identifier)
+              right: (identifier)
+              right: (identifier)))
+          (action
+            label: (label)
+            (becomes_member
+              left: (identifier)
+              right: (binary_expression
+                left: (identifier)
+                right: (set_enumeration
+                  (identifier)))))
+          (action
+            label: (label)
+            (becomes_such
+              left: (identifier)
+              predicate: (comparison_predicate
+                left: (identifier)
+                right: (identifier))))
+          (action
+            label: (label)
+            (assignment
+              left: (function_application
+                function: (identifier)
+                argument: (identifier))
+              right: (identifier)))
+          (action
+            label: (label)
+            (becomes_member
+              left: (identifier)
+              right: (identifier)))
+          (action
+            label: (label)
+            (becomes_such
+              left: (identifier)
+              predicate: (comparison_predicate
+                left: (identifier)
+                right: (identifier)))))))))
+
+================================================================================
+variant clause
+================================================================================
+
+machine M
+  variables n
+  variant n ∗ 2 + 1
+  events
+    anticipated event down
+      then
+        @act1 n ≔ n − 1
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    name: (identifier)
+    (variables_clause
+      (identifier))
+    (variant_clause
+      expression: (binary_expression
+        left: (binary_expression
+          left: (identifier)
+          right: (number))
+        right: (number)))
+    (events_clause
+      (event
+        name: (identifier)
+        (then_clause
+          (action
+            label: (label)
+            (assignment
+              left: (identifier)
+              right: (binary_expression
+                left: (identifier)
+                right: (number)))))))))
+
+================================================================================
+unlabeled guards and actions
+================================================================================
+
+machine M
+  events
+    event e
+      where
+        x > 0
+        y < 5
+      then
+        x ≔ 0
+        y ≔ 1
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    name: (identifier)
+    (events_clause
+      (event
+        name: (identifier)
+        (where_clause
+          (guard
+            predicate: (comparison_predicate
+              left: (identifier)
+              right: (number)))
+          (guard
+            predicate: (comparison_predicate
+              left: (identifier)
+              right: (number))))
+        (then_clause
+          (action
+            (assignment
+              left: (identifier)
+              right: (number)))
+          (action
+            (assignment
+              left: (identifier)
+              right: (number))))))))
