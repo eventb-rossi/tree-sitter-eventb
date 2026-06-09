@@ -63,6 +63,25 @@ const PRED = {
   negation: 6,
 };
 
+// Expression precedence, lowest → highest (kernel_lang §3.3.4, Table 3.1).
+// Like rossi, levels the spec declares non-associative (relation arrows,
+// interval, exponent) parse left-associated chains permissively; the set
+// operator compatibility matrix (Table 3.2) is likewise a semantic check,
+// not a parse-time one. Unary minus binds tighter than `^`, matching rossi's
+// grammar.pest (`-a^b` is `(-a)^b`) rather than the spec's arithmetic level.
+const EXPR = {
+  quantified: 1,
+  maplet: 2,
+  arrow: 3,
+  setop: 4,
+  interval: 5,
+  additive: 6,
+  multiplicative: 7,
+  exponent: 8,
+  unary: 9,
+  postfix: 10,
+};
+
 export default grammar({
   name: 'eventb',
 
@@ -278,6 +297,10 @@ export default grammar({
 
     _expression: ($) =>
       choice(
+        $.binary_expression,
+        $.unary_expression,
+        $.inverse_expression,
+        $.relational_image,
         $.identifier,
         $.number,
         $.string,
@@ -293,11 +316,104 @@ export default grammar({
         $.parenthesized_expression,
       ),
 
+    binary_expression: ($) => {
+      // [level, operator] — ASCII spellings alias to the canonical Unicode
+      // operator, so consumers and queries see a single spelling. U+E100–E103
+      // are the Rodin private-use code points for ⤨-style relation arrows and
+      // relational override.
+      const table = [
+        // Pair constructor (maplet), left-associative.
+        [EXPR.maplet, choice('↦', alias('|->', '↦'))],
+        // Set-of-relations constructors (and rossi's ⦂ type ascription).
+        [EXPR.arrow, choice('↔', alias('<->', '↔'))],
+        [EXPR.arrow, choice(alias('', '<<->'), '<<->')],
+        [EXPR.arrow, choice(alias('', '<->>'), '<->>')],
+        [EXPR.arrow, choice(alias('', '<<->>'), '<<->>')],
+        [EXPR.arrow, choice('⇸', alias('+->', '⇸'))],
+        [EXPR.arrow, choice('→', alias('-->', '→'))],
+        [EXPR.arrow, choice('⤔', alias('>+>', '⤔'))],
+        [EXPR.arrow, choice('↣', alias('>->', '↣'))],
+        [EXPR.arrow, choice('⤀', alias('+>>', '⤀'))],
+        [EXPR.arrow, choice('↠', alias('->>', '↠'))],
+        [EXPR.arrow, choice('⤖', alias('>->>', '⤖'))],
+        [EXPR.arrow, choice('⦂', alias(ci('oftype'), '⦂'))],
+        // Binary set operators.
+        [EXPR.setop, choice('∪', alias('\\/', '∪'))],
+        [EXPR.setop, choice('∩', alias('/\\', '∩'))],
+        [EXPR.setop, choice('∖', alias('\\', '∖'))],
+        [EXPR.setop, choice('×', alias('**', '×'))],
+        [EXPR.setop, ';'],
+        [EXPR.setop, choice('∘', alias(ci('circ'), '∘'))],
+        [EXPR.setop, choice('⊕', alias('', '⊕'), alias('<+', '⊕'))],
+        [EXPR.setop, choice('◁', alias('<|', '◁'))],
+        [EXPR.setop, choice('⩤', alias('<<|', '⩤'))],
+        [EXPR.setop, choice('▷', alias('|>', '▷'))],
+        [EXPR.setop, choice('⩥', alias('|>>', '⩥'))],
+        [EXPR.setop, choice('⊗', alias('><', '⊗'))],
+        [EXPR.setop, choice('∥', alias('||', '∥'))],
+        // Interval constructor.
+        [EXPR.interval, choice('‥', alias('..', '‥'))],
+        // Arithmetic.
+        [EXPR.additive, '+'],
+        [EXPR.additive, choice('−', alias('-', '−'))],
+        [EXPR.multiplicative, choice('∗', alias('*', '∗'))],
+        [EXPR.multiplicative, choice('÷', alias('/', '÷'))],
+        [EXPR.multiplicative, alias(ci('mod'), 'mod')],
+        [EXPR.exponent, '^'],
+      ];
+      return choice(
+        ...table.map(([level, operator]) =>
+          prec.left(
+            level,
+            seq(
+              field('left', $._expression),
+              field('operator', operator),
+              field('right', $._expression),
+            ),
+          ),
+        ),
+      );
+    },
+
+    unary_expression: ($) =>
+      prec(
+        EXPR.unary,
+        seq(
+          field('operator', choice(
+            choice('−', alias('-', '−')),
+            choice('ℙ1', alias(ci('pow1'), 'ℙ1')),
+            choice('ℙ', alias(ci('pow'), 'ℙ')),
+            alias(ci('dom'), 'dom'),
+            alias(ci('ran'), 'ran'),
+          )),
+          field('operand', $._expression),
+        ),
+      ),
+
+    // Postfix converse: r∼ (r~).
+    inverse_expression: ($) =>
+      prec.left(
+        EXPR.postfix,
+        seq(field('operand', $._expression), choice('∼', alias('~', '∼'))),
+      ),
+
+    // Relational image: r[S].
+    relational_image: ($) =>
+      prec.left(
+        EXPR.postfix,
+        seq(
+          field('relation', $._expression),
+          '[',
+          field('image', $._expression),
+          ']',
+        ),
+      ),
+
     // The function position is an atom or another postfix expression, not an
-    // arbitrary expression: f(x), prj1(s)(t), (E)(x).
+    // arbitrary expression: f(x), prj1(s)(t), (E)(x), f∼(x), r[S](x).
     function_application: ($) =>
       prec.left(
-        10,
+        EXPR.postfix,
         seq(
           field(
             'function',
@@ -306,6 +422,8 @@ export default grammar({
               $.builtin,
               $.function_application,
               $.parenthesized_expression,
+              $.inverse_expression,
+              $.relational_image,
             ),
           ),
           '(',
