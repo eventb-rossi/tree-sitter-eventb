@@ -1,0 +1,75 @@
+================================================================================
+context: sections, label, set membership
+================================================================================
+
+context C
+  constants n
+  axioms
+    @axm1 n ∈ ℕ
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (keyword)
+  (identifier)
+  (keyword)
+  (identifier)
+  (keyword)
+  (label)
+  (identifier)
+  (operator_sym)
+  (constant_sym)
+  (keyword))
+
+================================================================================
+comment, assignment, number, operator, string
+================================================================================
+
+// a comment
+x := 42 ∧ y
+"a string"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (comment)
+  (identifier)
+  (operator_sym)
+  (number)
+  (operator_sym)
+  (identifier)
+  (string))
+
+================================================================================
+machine: event with guard-free action
+================================================================================
+
+machine M
+  variables c
+  events
+    event inc
+      then
+        @act1 c := c + 1
+      end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (keyword)
+  (identifier)
+  (keyword)
+  (identifier)
+  (keyword)
+  (keyword)
+  (identifier)
+  (keyword)
+  (label)
+  (identifier)
+  (operator_sym)
+  (identifier)
+  (operator_sym)
+  (number)
+  (keyword)
+  (keyword))

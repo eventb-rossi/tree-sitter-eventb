@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Generate, parse-test, and verify token contract
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # Node 22 LTS: node-tree-sitter (the `tree-sitter` dev dependency, latest
+      # 0.25.0) compiles its binding with -std=c++17 and ships no prebuilds,
+      # while Node 23+ V8 headers require C++20 — so it cannot build on Node 24.
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      # Installs tree-sitter-cli (pinned) and builds the native node binding.
+      - name: Install dependencies
+        run: npm ci
+
+      # The committed parser must be exactly what the current grammar.js produces.
+      - name: Regenerate parser
+        run: npx tree-sitter generate
+
+      # `git add -N` so files newly created by `tree-sitter generate` (untracked)
+      # also fail the freshness check, not just modified ones.
+      - name: Check parser is up to date
+        run: |
+          git add -N src
+          git diff --exit-code -- src
+
+      # Parse-tree corpus.
+      - name: tree-sitter test
+        run: npx tree-sitter test
+
+      # Behavioral contract: every spelling in the generated test/tokens.json must
+      # tokenize to its node — proves the generated core matches `rossi gen-grammars`
+      # even after the grammar is hand-extended. Also runs the binding smoke test.
+      - name: Token contract + binding test
+        run: npm test
+
+  # The Rust binding ships on crates.io-style consumers (Helix-from-source,
+  # `cargo add tree-sitter-eventb`); compile and test it so it cannot rot.
+  rust:
+    name: Build and test the Rust binding
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Test
+        run: cargo test

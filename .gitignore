@@ -1,0 +1,14 @@
+# tree-sitter-cli is only needed to regenerate src/parser.c; the generated
+# parser under src/ is committed so editors can build the grammar without Node.
+# package-lock.json IS committed so CI's `npm ci` is reproducible.
+/node_modules/
+
+# Native build outputs — the committed src/parser.c is the source of truth.
+/build/
+/prebuilds/
+*.node
+*.wasm
+
+# Rust binding build output (this is a library crate; the lockfile is not pinned).
+/target/
+/Cargo.lock
