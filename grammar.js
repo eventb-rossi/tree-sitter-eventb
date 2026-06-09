@@ -1,82 +1,134 @@
 // Tree-sitter grammar for Event-B (Rossi), consumed by the Zed extension,
 // nvim-treesitter, Helix, and other tree-sitter integrations.
 //
-// This is a *lexical* grammar: it recognises each coloured token class as its
-// own node so `queries/highlights.scm` can paint it. It deliberately does not
-// parse Event-B structure — the Rossi language server (`eventb-language-server`)
-// provides diagnostics, completion, outline, folding and the rest over LSP
-// (Zed, for one, can overlay the server's semantic tokens via
-// `"semantic_tokens": "combined"`).
+// This is a *structural* grammar for the textual `.eventb` syntax: it parses
+// components (contexts and machines), their clauses, events, predicates and
+// expressions, following the reference implementation in
+// `crates/rossi/src/grammar.pest` and *The Event-B Mathematical Language*
+// (Métayer & Voisin, 2009) — see EVENTB_LANGUAGE_REFERENCE.md in the rossi
+// monorepo for the consolidated language reference.
 //
-// The token rules between the `cargo xtask gen-grammars` markers are GENERATED from
-// the canonical token tables (crates/rossi/src/{keywords,operators,builtins}.rs).
-// After changing those tables run `cargo xtask gen-grammars`, then
-// `tree-sitter generate` to refresh src/parser.c. Everything else here is
-// hand-maintained.
-//
-// No token carries precedence: tree-sitter's lexer resolves ties by precedence
-// before length, so a precedence bump would let `mod` win over the longer
-// `model` and `/` win over the `//` comment. Plain longest-match keeps
-// identifiers and comments whole; the `word` directive below resolves the only
-// exact-length tie (a whole word that equals a keyword).
+// Design notes:
+// - Keywords are case-insensitive (like rossi and Camille). Each keyword is a
+//   regex token aliased to its canonical lowercase spelling, so queries match
+//   plain strings ("machine", "sees", …). No keyword token carries lexical
+//   precedence: tree-sitter resolves lexing ties by precedence before length,
+//   and a precedence bump would let a keyword eat the prefix of a longer
+//   identifier. Plain longest-match keeps identifiers whole; the `word`
+//   directive below resolves exact-length ties (a whole word equal to a
+//   keyword) in the keyword's favour — which is also what terminates
+//   space-separated identifier lists at the next clause keyword.
+// - Identifier lists accept optional commas, like rossi (spec says
+//   space-separated; Rodin's text tools also emit commas).
 
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
+/** Case-insensitive regex for a keyword, e.g. ci('end') => /[eE][nN][dD]/ */
+function ci(word) {
+  return new RegExp(
+    word
+      .split('')
+      .map((c) => (/[a-z]/.test(c) ? `[${c}${c.toUpperCase()}]` : c))
+      .join(''),
+  );
+}
+
+/** A case-insensitive keyword displayed as its canonical lowercase spelling. */
+function kw(word) {
+  return alias(token(ci(word)), word);
+}
+
+/** One or more `rule`s separated by optional commas (identifier lists). */
+function spaceSep1(rule) {
+  return seq(rule, repeat(seq(optional(','), rule)));
+}
+
+/** One or more `rule`s separated by mandatory commas. */
+function commaSep1(rule) {
+  return seq(rule, repeat(seq(',', rule)));
+}
+
 export default grammar({
   name: 'eventb',
 
-  // Whitespace separates tokens; comments are nodes (so they highlight) but are
-  // skippable anywhere, so they live in `extras` rather than the token stream.
-  extras: $ => [/\s/, $.comment],
+  // Whitespace separates tokens; comments are nodes (so they highlight) but
+  // are skippable anywhere.
+  extras: ($) => [/\s/, $.comment],
 
-  // Enable keyword extraction: a whole-word match of a `*_word` token resolves
-  // to that token rather than to `identifier`, while `extends_foo` stays an
-  // identifier. This is what lets the generated word tokens carry no precedence
-  // yet still win the exact-length tie against `identifier`.
-  word: $ => $.identifier,
+  // Keyword extraction: a whole-word token that exactly matches a keyword
+  // resolves to the keyword where the keyword is valid, and to `identifier`
+  // elsewhere. This is what makes keywords reserved words.
+  word: ($) => $.identifier,
 
   rules: {
-    source_file: $ => repeat($._token),
+    source_file: ($) => repeat(choice($.context, $.machine)),
 
-    // A document is a flat stream of coloured tokens. We do not impose Event-B
-    // structure here; the language server understands the model. The token
-    // rules referenced here are generated below (`cargo xtask gen-grammars`), split
-    // into word/symbol nodes per coloured class.
-    _token: $ => choice(
-      $.keyword,
-      $.status_keyword,
-      $.constant_word,
-      $.constant_sym,
-      $.builtin,
-      $.operator_word,
-      $.operator_sym,
-      $.label,
-      $.number,
-      $.string,
-      $.identifier,
-      $._punctuation,
-    ),
+    // ==========================
+    // Context
+    // ==========================
 
-    // >>> cargo xtask gen-grammars (generated, do not edit)
-    keyword: $ => token(/(?:initialisation|invariants|constants|variables|theorems|context|extends|machine|refines|variant|witness|axioms|events|status|begin|event|where|sees|sets|then|when|with|any|end)/i),
-    status_keyword: $ => token(/(?:anticipated|convergent|ordinary|theorem|skip)/i),
-    constant_sym: $ => token(choice("ℕ1", "ℕ", "ℤ", "∅", "⊤", "⊥", "{}")),
-    constant_word: $ => token(/(?:FALSE|false|BOOL|NAT1|TRUE|bool|true|INT|NAT)/),
-    builtin: $ => token(/(?:partition|finite|card|pred|prj1|prj2|succ|max|min|id)/),
-    operator_sym: $ => token(choice("<<->>", "/<<:", ":∈", ":∣", "<->>", "<<->", ">->>", "ℙ1", "+->", "+>>", "-->", "->>", "/<:", "<->", "<<:", "<<|", "<=>", ">+>", ">->", "|->", "|>>", "‥", "ℙ", "→", "↔", "↠", "↣", "↦", "⇒", "⇔", "⇸", "∀", "∃", "∈", "∉", "−", "∖", "∗", "∘", "∣", "∥", "∧", "∨", "∩", "∪", "∼", "≔", "≠", "≤", "≥", "⊂", "⊄", "⊆", "⊈", "⊗", "⋂", "⋃", "▷", "◁", "⤀", "⤔", "⤖", "⦂", "⩤", "⩥", "", "", "", "", "**", "..", "/:", "/=", "/\\", "::", ":=", ":|", "<+", "<:", "<=", "<|", "=>", "><", ">=", "\\/", "|>", "||", "¬", "·", "×", "÷", "λ", "!", "#", "%", "&", "*", "+", "-", ".", "/", ":", ";", "<", "=", ">", "\\", "^", "|", "~")),
-    operator_word: $ => token(/(?:oftype|INTER|UNION|POW1|circ|POW|dom|mod|not|ran|or)/),
-    // <<< cargo xtask gen-grammars
+    context: ($) =>
+      seq(
+        kw('context'),
+        field('name', $.identifier),
+        repeat($._context_clause),
+        kw('end'),
+      ),
 
-    // Hand-maintained structural tokens.
-    identifier: $ => /[a-zA-Z_][a-zA-Z0-9_']*/,
-    number: $ => /[0-9]+/,
-    label: $ => /@[A-Za-z0-9_]+/,
-    string: $ => token(seq('"', repeat(choice(/[^"\\]/, /\\./)), '"')),
-    comment: $ => token(choice(
-      seq('//', /[^\n]*/),
-      seq('/*', /[^*]*\*+([^/*][^*]*\*+)*/, '/'),
-    )),
-    _punctuation: $ => choice('(', ')', '[', ']', '{', '}', ','),
-  }
+    _context_clause: ($) =>
+      choice($.extends_clause, $.sets_clause, $.constants_clause),
+
+    extends_clause: ($) => seq(kw('extends'), spaceSep1($.identifier)),
+
+    sets_clause: ($) => seq(kw('sets'), spaceSep1($.set_declaration)),
+
+    // Deferred set (S) or enumerated set (S = {a, b, c}).
+    set_declaration: ($) =>
+      seq(
+        field('name', $.identifier),
+        optional(seq('=', '{', commaSep1($.identifier), '}')),
+      ),
+
+    constants_clause: ($) => seq(kw('constants'), spaceSep1($.identifier)),
+
+    // ==========================
+    // Machine
+    // ==========================
+
+    machine: ($) =>
+      seq(
+        kw('machine'),
+        field('name', $.identifier),
+        repeat($._machine_clause),
+        kw('end'),
+      ),
+
+    _machine_clause: ($) =>
+      choice($.refines_clause, $.sees_clause, $.variables_clause),
+
+    refines_clause: ($) => seq(kw('refines'), field('target', $.identifier)),
+
+    sees_clause: ($) => seq(kw('sees'), spaceSep1($.identifier)),
+
+    variables_clause: ($) => seq(kw('variables'), spaceSep1($.identifier)),
+
+    // ==========================
+    // Lexical tokens
+    // ==========================
+
+    identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_']*/,
+    number: ($) => /[0-9]+/,
+    // Per the TextEditor EBNF: all characters following `@` belong to the
+    // label until the next whitespace character.
+    label: ($) => /@[^\s]+/,
+    string: ($) => token(seq('"', repeat(choice(/[^"\\]/, /\\./)), '"')),
+    comment: ($) =>
+      token(
+        choice(
+          seq('//', /[^\n]*/),
+          seq('/*', /[^*]*\*+([^/*][^*]*\*+)*/, '/'),
+        ),
+      ),
+  },
 });

@@ -1,5 +1,175 @@
 [
   {
+    "type": "constants_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "context",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "constants_clause",
+          "named": true
+        },
+        {
+          "type": "extends_clause",
+          "named": true
+        },
+        {
+          "type": "sets_clause",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "extends_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "machine",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "refines_clause",
+          "named": true
+        },
+        {
+          "type": "sees_clause",
+          "named": true
+        },
+        {
+          "type": "variables_clause",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "refines_clause",
+    "named": true,
+    "fields": {
+      "target": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "sees_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "set_declaration",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "sets_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "set_declaration",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "source_file",
     "named": true,
     "root": true,
@@ -9,75 +179,38 @@
       "required": false,
       "types": [
         {
-          "type": "builtin",
+          "type": "context",
           "named": true
         },
         {
-          "type": "constant_sym",
-          "named": true
-        },
-        {
-          "type": "constant_word",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "keyword",
-          "named": true
-        },
-        {
-          "type": "label",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "operator_sym",
-          "named": true
-        },
-        {
-          "type": "operator_word",
-          "named": true
-        },
-        {
-          "type": "status_keyword",
-          "named": true
-        },
-        {
-          "type": "string",
+          "type": "machine",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "(",
-    "named": false
-  },
-  {
-    "type": ")",
-    "named": false
+    "type": "variables_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": ",",
     "named": false
   },
   {
-    "type": "[",
+    "type": "=",
     "named": false
-  },
-  {
-    "type": "]",
-    "named": false
-  },
-  {
-    "type": "builtin",
-    "named": true
   },
   {
     "type": "comment",
@@ -85,44 +218,44 @@
     "extra": true
   },
   {
-    "type": "constant_sym",
-    "named": true
+    "type": "constants",
+    "named": false
   },
   {
-    "type": "constant_word",
-    "named": true
+    "type": "context",
+    "named": false
+  },
+  {
+    "type": "end",
+    "named": false
+  },
+  {
+    "type": "extends",
+    "named": false
   },
   {
     "type": "identifier",
     "named": true
   },
   {
-    "type": "keyword",
-    "named": true
+    "type": "machine",
+    "named": false
   },
   {
-    "type": "label",
-    "named": true
+    "type": "refines",
+    "named": false
   },
   {
-    "type": "number",
-    "named": true
+    "type": "sees",
+    "named": false
   },
   {
-    "type": "operator_sym",
-    "named": true
+    "type": "sets",
+    "named": false
   },
   {
-    "type": "operator_word",
-    "named": true
-  },
-  {
-    "type": "status_keyword",
-    "named": true
-  },
-  {
-    "type": "string",
-    "named": true
+    "type": "variables",
+    "named": false
   },
   {
     "type": "{",
