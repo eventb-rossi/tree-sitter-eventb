@@ -1,0 +1,116 @@
+================================================================================
+context: empty
+================================================================================
+
+context C0
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)))
+
+================================================================================
+context: extends, constants
+================================================================================
+
+context C1
+  extends C0
+  constants a b, c
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (extends_clause
+      (identifier))
+    (constants_clause
+      (identifier)
+      (identifier)
+      (identifier))))
+
+================================================================================
+context: deferred and enumerated sets
+================================================================================
+
+context C2
+  sets S T = {a, b, c} U
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (sets_clause
+      (set_declaration
+        name: (identifier))
+      (set_declaration
+        name: (identifier)
+        (identifier)
+        (identifier)
+        (identifier))
+      (set_declaration
+        name: (identifier)))))
+
+================================================================================
+context: uppercase keywords (case-insensitive)
+================================================================================
+
+CONTEXT counter_ctx
+SETS
+    STATUS
+CONSTANTS
+    max_value
+END
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (sets_clause
+      (set_declaration
+        name: (identifier)))
+    (constants_clause
+      (identifier))))
+
+================================================================================
+context: keyword-prefixed identifiers stay identifiers
+================================================================================
+
+context events_of_partition
+  constants extends_foo end_marker
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (constants_clause
+      (identifier)
+      (identifier))))
+
+================================================================================
+context: comments
+================================================================================
+
+// header comment
+context C3 /* inline */
+  constants x // trailing
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (comment)
+  (context
+    name: (identifier)
+    (comment)
+    (constants_clause
+      (identifier))
+    (comment)))

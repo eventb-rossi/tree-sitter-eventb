@@ -1,75 +1,66 @@
 ================================================================================
-context: sections, label, set membership
+machine: empty
 ================================================================================
 
-context C
-  constants n
-  axioms
-    @axm1 n ∈ ℕ
+machine M0
 end
 
 --------------------------------------------------------------------------------
 
 (source_file
-  (keyword)
-  (identifier)
-  (keyword)
-  (identifier)
-  (keyword)
-  (label)
-  (identifier)
-  (operator_sym)
-  (constant_sym)
-  (keyword))
+  (machine
+    name: (identifier)))
 
 ================================================================================
-comment, assignment, number, operator, string
+machine: refines, sees, variables
 ================================================================================
 
-// a comment
-x := 42 ∧ y
-"a string"
-
---------------------------------------------------------------------------------
-
-(source_file
-  (comment)
-  (identifier)
-  (operator_sym)
-  (number)
-  (operator_sym)
-  (identifier)
-  (string))
-
-================================================================================
-machine: event with guard-free action
-================================================================================
-
-machine M
-  variables c
-  events
-    event inc
-      then
-        @act1 c := c + 1
-      end
+machine M1
+  refines M0
+  sees C0 C1
+  variables x y, z
 end
 
 --------------------------------------------------------------------------------
 
 (source_file
-  (keyword)
-  (identifier)
-  (keyword)
-  (identifier)
-  (keyword)
-  (keyword)
-  (identifier)
-  (keyword)
-  (label)
-  (identifier)
-  (operator_sym)
-  (identifier)
-  (operator_sym)
-  (number)
-  (keyword)
-  (keyword))
+  (machine
+    name: (identifier)
+    (refines_clause
+      target: (identifier))
+    (sees_clause
+      (identifier)
+      (identifier))
+    (variables_clause
+      (identifier)
+      (identifier)
+      (identifier))))
+
+================================================================================
+multiple components in one file
+================================================================================
+
+context C0
+end
+
+machine M0
+  sees C0
+end
+
+machine M1
+  refines M0
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier))
+  (machine
+    name: (identifier)
+    (sees_clause
+      (identifier)))
+  (machine
+    name: (identifier)
+    (refines_clause
+      target: (identifier))))
