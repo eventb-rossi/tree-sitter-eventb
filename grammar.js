@@ -100,6 +100,12 @@ export default grammar({
     // parenthesized predicate or a parenthesized expression that a relational
     // operator will follow. GLR keeps both readings until one completes.
     [$._predicate, $._expression],
+    // In `{x, …` an identifier is either a comprehension binder or the first
+    // element of a set enumeration (or the expression form's element).
+    [$.typed_identifier, $._expression],
+    // `bool` followed by `(` is a predicate-to-BOOL conversion, but `bool`
+    // is also the BOOL type literal.
+    [$.bool_conversion, $.bool_set],
   ],
 
   rules: {
@@ -219,7 +225,7 @@ export default grammar({
         seq(
           field('quantifier', choice('∀', alias('!', '∀'), '∃', alias('#', '∃'))),
           commaSep1(field('binder', $.typed_identifier)),
-          choice('·', alias('.', '·')),
+          $._dot,
           field('body', $._predicate),
         ),
       ),
@@ -313,7 +319,17 @@ export default grammar({
         $.empty_set,
         $.builtin,
         $.function_application,
+        $.function_override,
         $.parenthesized_expression,
+        $.set_enumeration,
+        $.set_comprehension,
+        $.lambda_expression,
+        $.quantified_union,
+        $.quantified_inter,
+        $.generalized_union,
+        $.generalized_inter,
+        $.bool_conversion,
+        $.if_expression,
       ),
 
     binary_expression: ($) => {
@@ -408,6 +424,192 @@ export default grammar({
           ']',
         ),
       ),
+
+    // Rodin's compact spelling of functional override: f{x ↦ y} is sugar for
+    // f ⊕ {x ↦ y}.
+    function_override: ($) =>
+      prec.left(
+        EXPR.postfix,
+        seq(
+          field(
+            'function',
+            choice(
+              $.identifier,
+              $.builtin,
+              $.function_application,
+              $.function_override,
+              $.parenthesized_expression,
+              $.inverse_expression,
+              $.relational_image,
+            ),
+          ),
+          '{',
+          commaSep1($._expression),
+          '}',
+        ),
+      ),
+
+    // ==========================
+    // Set constructors and quantified expressions
+    // ==========================
+
+    set_enumeration: ($) => seq('{', commaSep1($._expression), '}'),
+
+    // Three forms (kernel_lang §3.3.6, rossi grammar.pest):
+    //   {x, y · P | E}   extended (explicit binders)
+    //   {x, y | P}       basic with binder list
+    //   {E | P}          expression form, e.g. {x ↦ y | P}
+    // For a single bare identifier the binder and expression forms coincide;
+    // dynamic precedence picks the binder reading, like rossi's PEG order.
+    set_comprehension: ($) =>
+      seq(
+        '{',
+        choice(
+          prec.dynamic(
+            2,
+            seq(
+              commaSep1(field('binder', $.typed_identifier)),
+              $._dot,
+              field('condition', $._predicate),
+              $._pipe,
+              field('body', $._expression),
+            ),
+          ),
+          prec.dynamic(
+            1,
+            seq(
+              commaSep1(field('binder', $.typed_identifier)),
+              $._pipe,
+              field('condition', $._predicate),
+            ),
+          ),
+          seq(
+            field('element', $._expression),
+            $._pipe,
+            field('condition', $._predicate),
+          ),
+        ),
+        '}',
+      ),
+
+    // λ ident-pattern · P | E. The pattern is a left-associative maplet tree
+    // over (possibly typed, possibly parenthesized) identifiers; ↦ binds to
+    // the pattern, never to a type annotation (kernel_lang §3.3.6).
+    lambda_expression: ($) =>
+      prec.right(
+        EXPR.quantified,
+        seq(
+          choice('λ', alias('%', 'λ')),
+          field('pattern', $._ident_pattern),
+          $._dot,
+          field('condition', $._predicate),
+          $._pipe,
+          field('body', $._expression),
+        ),
+      ),
+
+    _ident_pattern: ($) => choice($.maplet_pattern, $._ident_pattern_atom),
+
+    maplet_pattern: ($) =>
+      prec.left(
+        seq(
+          $._ident_pattern,
+          choice('↦', alias('|->', '↦')),
+          $._ident_pattern,
+        ),
+      ),
+
+    _ident_pattern_atom: ($) =>
+      choice(
+        seq('(', $._ident_pattern, ')'),
+        alias($.pattern_typed_identifier, $.typed_identifier),
+      ),
+
+    // A pattern binder's type annotation stops before any top-level ↦, which
+    // belongs to the pattern (kernel_lang §3.3.6: types use × and the
+    // relation arrows, never a bare maplet). prec.right at the arrow level
+    // makes ↦ (level 2) reduce out of the type while arrows (level 3) still
+    // extend it: λx⦂ℤ ↦ y⦂BOOL · … binds two variables.
+    pattern_typed_identifier: ($) =>
+      prec.right(
+        EXPR.arrow,
+        seq(
+          field('name', $.identifier),
+          optional(
+            seq(
+              choice('⦂', alias(ci('oftype'), '⦂')),
+              field('type', $._expression),
+            ),
+          ),
+        ),
+      ),
+
+    quantified_union: ($) =>
+      prec.right(
+        EXPR.quantified,
+        seq(
+          choice('⋃', alias(ci('union'), '⋃')),
+          commaSep1(field('binder', $.typed_identifier)),
+          $._dot,
+          field('condition', $._predicate),
+          $._pipe,
+          field('body', $._expression),
+        ),
+      ),
+
+    quantified_inter: ($) =>
+      prec.right(
+        EXPR.quantified,
+        seq(
+          choice('⋂', alias(ci('inter'), '⋂')),
+          commaSep1(field('binder', $.typed_identifier)),
+          $._dot,
+          field('condition', $._predicate),
+          $._pipe,
+          field('body', $._expression),
+        ),
+      ),
+
+    // Generalized union/inter of a set of sets: union(S), inter(S).
+    generalized_union: ($) =>
+      seq(
+        choice('⋃', alias(ci('union'), '⋃')),
+        '(',
+        field('argument', $._expression),
+        ')',
+      ),
+
+    generalized_inter: ($) =>
+      seq(
+        choice('⋂', alias(ci('inter'), '⋂')),
+        '(',
+        field('argument', $._expression),
+        ')',
+      ),
+
+    // bool(P) converts a predicate to a BOOL value.
+    bool_conversion: ($) =>
+      seq(
+        alias(token(ci('bool')), 'bool'),
+        '(',
+        field('predicate', $._predicate),
+        ')',
+      ),
+
+    // IF P THEN E1 ELSE E2 END (ProB extension).
+    if_expression: ($) =>
+      seq(
+        kw('if'),
+        field('condition', $._predicate),
+        kw('then'),
+        field('consequence', $._expression),
+        kw('else'),
+        field('alternative', $._expression),
+        kw('end'),
+      ),
+
+    _dot: ($) => choice('·', alias('.', '·')),
+    _pipe: ($) => choice('∣', alias('|', '∣')),
 
     // The function position is an atom or another postfix expression, not an
     // arbitrary expression: f(x), prj1(s)(t), (E)(x), f∼(x), r[S](x).

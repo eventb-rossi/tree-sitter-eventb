@@ -23,6 +23,9 @@
   "invariants"
   "theorem"
   "end"
+  "if"
+  "then"
+  "else"
 ] @keyword
 
 [
@@ -84,7 +87,13 @@
   "dom"
   "ran"
   "∼"
+  "λ"
+  "⋃"
+  "⋂"
+  "∣"
 ] @operator
+
+"bool" @function.builtin
 
 [
   (true)
