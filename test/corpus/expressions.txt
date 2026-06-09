@@ -1,0 +1,406 @@
+================================================================================
+arithmetic precedence and associativity
+================================================================================
+
+context C
+  axioms
+    @a x = a + b ∗ c ^ d
+    @b y = a − b − c
+    @c z = a mod b ÷ c
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (binary_expression
+              left: (identifier)
+              right: (binary_expression
+                left: (identifier)
+                right: (identifier))))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              right: (identifier))
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              right: (identifier))
+            right: (identifier)))))))
+
+================================================================================
+unary operators bind tighter than binary
+================================================================================
+
+context C
+  axioms
+    @a x = − a ∗ b
+    @b S ⊆ ℙ(T)
+    @c d = dom f ∪ ran g
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (unary_expression
+              operand: (identifier))
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (unary_expression
+            operand: (parenthesized_expression
+              (identifier)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (unary_expression
+              operand: (identifier))
+            right: (unary_expression
+              operand: (identifier))))))))
+
+================================================================================
+maplets are left-associative and loosest below quantification
+================================================================================
+
+context C
+  axioms
+    @a p = a ↦ b ↦ c
+    @b q = a + 1 ↦ b × c
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              right: (identifier))
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              right: (number))
+            right: (binary_expression
+              left: (identifier)
+              right: (identifier))))))))
+
+================================================================================
+relation arrows and set operators
+================================================================================
+
+context C
+  axioms
+    @a f ∈ A × B → C
+    @b g ∈ A ⇸ B
+    @c h ∈ A ↣ B ∪ C
+    @d r ∈ A  B
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              right: (identifier))
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (binary_expression
+              left: (identifier)
+              right: (identifier)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (identifier)))))))
+
+================================================================================
+intervals, restrictions, overrides, composition
+================================================================================
+
+context C
+  axioms
+    @a I = 1 ‥ n − 1
+    @b r = S ◁ f ⊕ g ▷ T
+    @c s = f ; g ∘ h
+    @d t = A ⩤ r ⩥ B
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (number)
+            right: (binary_expression
+              left: (identifier)
+              right: (number)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (binary_expression
+                left: (identifier)
+                right: (identifier))
+              right: (identifier))
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              right: (identifier))
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              right: (identifier))
+            right: (identifier)))))))
+
+================================================================================
+postfix: application, image, inverse
+================================================================================
+
+context C
+  axioms
+    @a y = f(x)
+    @b y = f(a, b)(c)
+    @c T = r[S]
+    @d s = f∼(x)
+    @e u = r[S]∼
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (function_application
+            function: (identifier)
+            argument: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (function_application
+            function: (function_application
+              function: (identifier)
+              argument: (identifier)
+              argument: (identifier))
+            argument: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (relational_image
+            relation: (identifier)
+            image: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (function_application
+            function: (inverse_expression
+              operand: (identifier))
+            argument: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (inverse_expression
+            operand: (relational_image
+              relation: (identifier)
+              image: (identifier))))))))
+
+================================================================================
+ASCII expression operators
+================================================================================
+
+context C
+  axioms
+    @a p = a |-> b
+    @b f : A +-> B \/ C
+    @c I = 1 .. n
+    @d x = a ** b * c
+    @e r = f ~
+    @f S = POW(T) \ U
+    @g m = a mod 2
+    @h g : A <<-> B
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (binary_expression
+              left: (identifier)
+              right: (identifier)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (number)
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (binary_expression
+              left: (identifier)
+              right: (identifier)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (inverse_expression
+            operand: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (unary_expression
+              operand: (parenthesized_expression
+                (identifier)))
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (number))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (identifier)))))))
+
+================================================================================
+strings and type ascription
+================================================================================
+
+context C
+  axioms
+    @a name = "hello \"world\""
+    @b p = prj1 ⦂ T
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (string)))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (builtin)
+            right: (identifier)))))))
