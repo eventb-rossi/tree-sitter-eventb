@@ -1,0 +1,376 @@
+================================================================================
+set enumerations and empty sets
+================================================================================
+
+context C
+  axioms
+    @a S = {1, 2, 3}
+    @b T = {}
+    @c U = ∅
+    @d V = {{1}, {2}}
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (set_enumeration
+            (number)
+            (number)
+            (number))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (empty_set)))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (empty_set)))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (set_enumeration
+            (set_enumeration
+              (number))
+            (set_enumeration
+              (number))))))))
+
+================================================================================
+set comprehensions: extended, binder, and expression forms
+================================================================================
+
+context C
+  axioms
+    @a A = {x · x ∈ ℕ | x ∗ 2}
+    @b B = {x | x < 10}
+    @c D = {x, y · x < y | x ↦ y}
+    @d E = {x ↦ y | x < y}
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (set_comprehension
+            binder: (typed_identifier
+              name: (identifier))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (natural_set))
+            body: (binary_expression
+              left: (identifier)
+              right: (number)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (set_comprehension
+            binder: (typed_identifier
+              name: (identifier))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (number)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (set_comprehension
+            binder: (typed_identifier
+              name: (identifier))
+            binder: (typed_identifier
+              name: (identifier))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (identifier))
+            body: (binary_expression
+              left: (identifier)
+              right: (identifier)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (set_comprehension
+            element: (binary_expression
+              left: (identifier)
+              right: (identifier))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (identifier))))))))
+
+================================================================================
+lambda expressions and patterns
+================================================================================
+
+context C
+  axioms
+    @a f = λx · x ∈ ℕ | x + 1
+    @b g = λx ↦ y · x < y | x + y
+    @c h = λ(x ↦ y) ↦ z · z > 0 | z
+    @d i = %x . x : NAT | x
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (lambda_expression
+            pattern: (typed_identifier
+              name: (identifier))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (natural_set))
+            body: (binary_expression
+              left: (identifier)
+              right: (number)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (lambda_expression
+            pattern: (maplet_pattern
+              (typed_identifier
+                name: (identifier))
+              (typed_identifier
+                name: (identifier)))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (identifier))
+            body: (binary_expression
+              left: (identifier)
+              right: (identifier)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (lambda_expression
+            pattern: (maplet_pattern
+              (maplet_pattern
+                (typed_identifier
+                  name: (identifier))
+                (typed_identifier
+                  name: (identifier)))
+              (typed_identifier
+                name: (identifier)))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (number))
+            body: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (lambda_expression
+            pattern: (typed_identifier
+              name: (identifier))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (natural_set))
+            body: (identifier)))))))
+
+================================================================================
+typed lambda pattern: maplet separates binders, not types
+================================================================================
+
+context C
+  axioms
+    @a f = λx⦂ℤ ↦ y⦂BOOL · x > 0 | y
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (lambda_expression
+            pattern: (maplet_pattern
+              (typed_identifier
+                name: (identifier)
+                type: (integer_set))
+              (typed_identifier
+                name: (identifier)
+                type: (bool_set)))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (number))
+            body: (identifier)))))))
+
+================================================================================
+quantified and generalized union/intersection
+================================================================================
+
+context C
+  axioms
+    @a A = ⋃x · x ⊆ S | x ∪ T
+    @b B = INTER x, y · x < y | {x, y}
+    @c D = union(S)
+    @d E = inter({A, B})
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (quantified_union
+            binder: (typed_identifier
+              name: (identifier))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (identifier))
+            body: (binary_expression
+              left: (identifier)
+              right: (identifier)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (quantified_inter
+            binder: (typed_identifier
+              name: (identifier))
+            binder: (typed_identifier
+              name: (identifier))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (identifier))
+            body: (set_enumeration
+              (identifier)
+              (identifier)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (generalized_union
+            argument: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (generalized_inter
+            argument: (set_enumeration
+              (identifier)
+              (identifier))))))))
+
+================================================================================
+bool conversion and BOOL literal
+================================================================================
+
+context C
+  axioms
+    @a b ∈ BOOL
+    @b x = bool(y < z)
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (bool_set)))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (bool_conversion
+            predicate: (comparison_predicate
+              left: (identifier)
+              right: (identifier))))))))
+
+================================================================================
+conditional expression (ProB extension)
+================================================================================
+
+context C
+  axioms
+    @a x = IF y > 0 THEN 1 ELSE 2 END
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (if_expression
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (number))
+            consequence: (number)
+            alternative: (number)))))))
+
+================================================================================
+functional override sugar
+================================================================================
+
+context C
+  axioms
+    @a g = f{1 ↦ 2}
+    @b h = f{x ↦ y, a ↦ b}
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (function_override
+            function: (identifier)
+            (binary_expression
+              left: (number)
+              right: (number)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (function_override
+            function: (identifier)
+            (binary_expression
+              left: (identifier)
+              right: (identifier))
+            (binary_expression
+              left: (identifier)
+              right: (identifier))))))))
