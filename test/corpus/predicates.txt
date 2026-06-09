@@ -1,0 +1,323 @@
+================================================================================
+axioms: labeled comparisons
+================================================================================
+
+context C
+  constants n
+  axioms
+    @axm1 n ∈ ℕ
+    @axm2 n > 0
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (constants_clause
+      (identifier))
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (natural_set)))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (number))))))
+
+================================================================================
+invariants and machine theorems, theorem flag orderings
+================================================================================
+
+machine M
+  variables x
+  invariants
+    @inv1 x ∈ ℕ
+    theorem @inv2 x ≥ 0
+    @inv3 theorem x < 10
+  theorems
+    @thm1 x ≥ 0
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    name: (identifier)
+    (variables_clause
+      (identifier))
+    (invariants_clause
+      (invariant
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (natural_set)))
+      (invariant
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (number)))
+      (invariant
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (number))))
+    (theorems_clause
+      (theorem
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (number))))))
+
+================================================================================
+logical connectives and precedence
+================================================================================
+
+context C
+  axioms
+    @a x = 1 ∧ y = 2 ∧ z = 3
+    @b x = 1 ∨ y = 2 ⇒ z = 3
+    @c x = 1 ⇔ y = 2
+    @d ¬ x = 1 ∧ y = 2
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (binary_predicate
+          left: (binary_predicate
+            left: (comparison_predicate
+              left: (identifier)
+              right: (number))
+            right: (comparison_predicate
+              left: (identifier)
+              right: (number)))
+          right: (comparison_predicate
+            left: (identifier)
+            right: (number))))
+      (axiom
+        label: (label)
+        predicate: (binary_predicate
+          left: (binary_predicate
+            left: (comparison_predicate
+              left: (identifier)
+              right: (number))
+            right: (comparison_predicate
+              left: (identifier)
+              right: (number)))
+          right: (comparison_predicate
+            left: (identifier)
+            right: (number))))
+      (axiom
+        label: (label)
+        predicate: (binary_predicate
+          left: (comparison_predicate
+            left: (identifier)
+            right: (number))
+          right: (comparison_predicate
+            left: (identifier)
+            right: (number))))
+      (axiom
+        label: (label)
+        predicate: (binary_predicate
+          left: (not_predicate
+            operand: (comparison_predicate
+              left: (identifier)
+              right: (number)))
+          right: (comparison_predicate
+            left: (identifier)
+            right: (number)))))))
+
+================================================================================
+quantified predicates, scope extends right
+================================================================================
+
+context C
+  axioms
+    @a ∀x · x ∈ ℕ ⇒ x ≥ 0
+    @b ∃x, y · x < y
+    @c ∀x · ∃y · y > x
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (quantified_predicate
+          binder: (typed_identifier
+            name: (identifier))
+          body: (binary_predicate
+            left: (comparison_predicate
+              left: (identifier)
+              right: (natural_set))
+            right: (comparison_predicate
+              left: (identifier)
+              right: (number)))))
+      (axiom
+        label: (label)
+        predicate: (quantified_predicate
+          binder: (typed_identifier
+            name: (identifier))
+          binder: (typed_identifier
+            name: (identifier))
+          body: (comparison_predicate
+            left: (identifier)
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (quantified_predicate
+          binder: (typed_identifier
+            name: (identifier))
+          body: (quantified_predicate
+            binder: (typed_identifier
+              name: (identifier))
+            body: (comparison_predicate
+              left: (identifier)
+              right: (identifier))))))))
+
+================================================================================
+predicate applications: finite, partition
+================================================================================
+
+context C
+  axioms
+    @a finite(S)
+    @b partition(S, A, B)
+    @c (x = 1) ∧ true
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (function_application
+          function: (builtin)
+          argument: (identifier)))
+      (axiom
+        label: (label)
+        predicate: (function_application
+          function: (builtin)
+          argument: (identifier)
+          argument: (identifier)
+          argument: (identifier)))
+      (axiom
+        label: (label)
+        predicate: (binary_predicate
+          left: (parenthesized_predicate
+            (comparison_predicate
+              left: (identifier)
+              right: (number)))
+          right: (true))))))
+
+================================================================================
+ASCII predicate operators
+================================================================================
+
+context C
+  axioms
+    @a !x . x : NAT => x >= 0
+    @b #y . y /= 0 & y <= 10
+    @c not x = 1 or y = 2
+    @d A <: B & C /<: D
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (quantified_predicate
+          binder: (typed_identifier
+            name: (identifier))
+          body: (binary_predicate
+            left: (comparison_predicate
+              left: (identifier)
+              right: (natural_set))
+            right: (comparison_predicate
+              left: (identifier)
+              right: (number)))))
+      (axiom
+        label: (label)
+        predicate: (quantified_predicate
+          binder: (typed_identifier
+            name: (identifier))
+          body: (binary_predicate
+            left: (comparison_predicate
+              left: (identifier)
+              right: (number))
+            right: (comparison_predicate
+              left: (identifier)
+              right: (number)))))
+      (axiom
+        label: (label)
+        predicate: (binary_predicate
+          left: (not_predicate
+            operand: (comparison_predicate
+              left: (identifier)
+              right: (number)))
+          right: (comparison_predicate
+            left: (identifier)
+            right: (number))))
+      (axiom
+        label: (label)
+        predicate: (binary_predicate
+          left: (comparison_predicate
+            left: (identifier)
+            right: (identifier))
+          right: (comparison_predicate
+            left: (identifier)
+            right: (identifier)))))))
+
+================================================================================
+typed binders
+================================================================================
+
+context C
+  axioms
+    @a ∀x⦂ℤ · x = x
+    @b ∃f oftype BOOL · f = TRUE
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (quantified_predicate
+          binder: (typed_identifier
+            name: (identifier)
+            type: (integer_set))
+          body: (comparison_predicate
+            left: (identifier)
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (quantified_predicate
+          binder: (typed_identifier
+            name: (identifier)
+            type: (bool_set))
+          body: (comparison_predicate
+            left: (identifier)
+            right: (true)))))))

@@ -1,5 +1,354 @@
 [
   {
+    "type": "axiom",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "label",
+            "named": true
+          }
+        ]
+      },
+      "predicate": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_predicate",
+            "named": true
+          },
+          {
+            "type": "comparison_predicate",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "not_predicate",
+            "named": true
+          },
+          {
+            "type": "parenthesized_predicate",
+            "named": true
+          },
+          {
+            "type": "quantified_predicate",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "axioms_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "axiom",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "binary_predicate",
+    "named": true,
+    "fields": {
+      "left": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_predicate",
+            "named": true
+          },
+          {
+            "type": "comparison_predicate",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "not_predicate",
+            "named": true
+          },
+          {
+            "type": "parenthesized_predicate",
+            "named": true
+          },
+          {
+            "type": "quantified_predicate",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      },
+      "operator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "⇒",
+            "named": false
+          },
+          {
+            "type": "⇔",
+            "named": false
+          },
+          {
+            "type": "∧",
+            "named": false
+          },
+          {
+            "type": "∨",
+            "named": false
+          }
+        ]
+      },
+      "right": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_predicate",
+            "named": true
+          },
+          {
+            "type": "comparison_predicate",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "not_predicate",
+            "named": true
+          },
+          {
+            "type": "parenthesized_predicate",
+            "named": true
+          },
+          {
+            "type": "quantified_predicate",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "comparison_predicate",
+    "named": true,
+    "fields": {
+      "left": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "bool_set",
+            "named": true
+          },
+          {
+            "type": "builtin",
+            "named": true
+          },
+          {
+            "type": "empty_set",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "integer_set",
+            "named": true
+          },
+          {
+            "type": "natural1_set",
+            "named": true
+          },
+          {
+            "type": "natural_set",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      },
+      "operator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "<",
+            "named": false
+          },
+          {
+            "type": "=",
+            "named": false
+          },
+          {
+            "type": ">",
+            "named": false
+          },
+          {
+            "type": "∈",
+            "named": false
+          },
+          {
+            "type": "∉",
+            "named": false
+          },
+          {
+            "type": "≠",
+            "named": false
+          },
+          {
+            "type": "≤",
+            "named": false
+          },
+          {
+            "type": "≥",
+            "named": false
+          },
+          {
+            "type": "⊂",
+            "named": false
+          },
+          {
+            "type": "⊄",
+            "named": false
+          },
+          {
+            "type": "⊆",
+            "named": false
+          },
+          {
+            "type": "⊈",
+            "named": false
+          }
+        ]
+      },
+      "right": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "bool_set",
+            "named": true
+          },
+          {
+            "type": "builtin",
+            "named": true
+          },
+          {
+            "type": "empty_set",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "integer_set",
+            "named": true
+          },
+          {
+            "type": "natural1_set",
+            "named": true
+          },
+          {
+            "type": "natural_set",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "constants_clause",
     "named": true,
     "fields": {},
@@ -34,6 +383,10 @@
       "required": false,
       "types": [
         {
+          "type": "axioms_clause",
+          "named": true
+        },
+        {
           "type": "constants_clause",
           "named": true
         },
@@ -43,6 +396,10 @@
         },
         {
           "type": "sets_clause",
+          "named": true
+        },
+        {
+          "type": "theorems_clause",
           "named": true
         }
       ]
@@ -58,6 +415,161 @@
       "types": [
         {
           "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "function_application",
+    "named": true,
+    "fields": {
+      "argument": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "bool_set",
+            "named": true
+          },
+          {
+            "type": "builtin",
+            "named": true
+          },
+          {
+            "type": "empty_set",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "integer_set",
+            "named": true
+          },
+          {
+            "type": "natural1_set",
+            "named": true
+          },
+          {
+            "type": "natural_set",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      },
+      "function": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "builtin",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "invariant",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "label",
+            "named": true
+          }
+        ]
+      },
+      "predicate": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_predicate",
+            "named": true
+          },
+          {
+            "type": "comparison_predicate",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "not_predicate",
+            "named": true
+          },
+          {
+            "type": "parenthesized_predicate",
+            "named": true
+          },
+          {
+            "type": "quantified_predicate",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "invariants_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "invariant",
           "named": true
         }
       ]
@@ -83,6 +595,10 @@
       "required": false,
       "types": [
         {
+          "type": "invariants_clause",
+          "named": true
+        },
+        {
           "type": "refines_clause",
           "named": true
         },
@@ -91,10 +607,242 @@
           "named": true
         },
         {
+          "type": "theorems_clause",
+          "named": true
+        },
+        {
           "type": "variables_clause",
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "not_predicate",
+    "named": true,
+    "fields": {
+      "operand": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_predicate",
+            "named": true
+          },
+          {
+            "type": "comparison_predicate",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "not_predicate",
+            "named": true
+          },
+          {
+            "type": "parenthesized_predicate",
+            "named": true
+          },
+          {
+            "type": "quantified_predicate",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      },
+      "operator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "¬",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "parenthesized_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "bool_set",
+          "named": true
+        },
+        {
+          "type": "builtin",
+          "named": true
+        },
+        {
+          "type": "empty_set",
+          "named": true
+        },
+        {
+          "type": "false",
+          "named": true
+        },
+        {
+          "type": "function_application",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "integer_set",
+          "named": true
+        },
+        {
+          "type": "natural1_set",
+          "named": true
+        },
+        {
+          "type": "natural_set",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "parenthesized_expression",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "true",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parenthesized_predicate",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "binary_predicate",
+          "named": true
+        },
+        {
+          "type": "comparison_predicate",
+          "named": true
+        },
+        {
+          "type": "false",
+          "named": true
+        },
+        {
+          "type": "function_application",
+          "named": true
+        },
+        {
+          "type": "not_predicate",
+          "named": true
+        },
+        {
+          "type": "parenthesized_predicate",
+          "named": true
+        },
+        {
+          "type": "quantified_predicate",
+          "named": true
+        },
+        {
+          "type": "true",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "quantified_predicate",
+    "named": true,
+    "fields": {
+      "binder": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "typed_identifier",
+            "named": true
+          }
+        ]
+      },
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_predicate",
+            "named": true
+          },
+          {
+            "type": "comparison_predicate",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "not_predicate",
+            "named": true
+          },
+          {
+            "type": "parenthesized_predicate",
+            "named": true
+          },
+          {
+            "type": "quantified_predicate",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      },
+      "quantifier": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "∀",
+            "named": false
+          },
+          {
+            "type": "∃",
+            "named": false
+          }
+        ]
+      }
     }
   },
   {
@@ -190,6 +938,149 @@
     }
   },
   {
+    "type": "theorem",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "label",
+            "named": true
+          }
+        ]
+      },
+      "predicate": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_predicate",
+            "named": true
+          },
+          {
+            "type": "comparison_predicate",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "not_predicate",
+            "named": true
+          },
+          {
+            "type": "parenthesized_predicate",
+            "named": true
+          },
+          {
+            "type": "quantified_predicate",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "theorems_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "theorem",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "typed_identifier",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "bool_set",
+            "named": true
+          },
+          {
+            "type": "builtin",
+            "named": true
+          },
+          {
+            "type": "empty_set",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": true
+          },
+          {
+            "type": "function_application",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "integer_set",
+            "named": true
+          },
+          {
+            "type": "natural1_set",
+            "named": true
+          },
+          {
+            "type": "natural_set",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "variables_clause",
     "named": true,
     "fields": {},
@@ -205,12 +1096,40 @@
     }
   },
   {
+    "type": "(",
+    "named": false
+  },
+  {
+    "type": ")",
+    "named": false
+  },
+  {
     "type": ",",
+    "named": false
+  },
+  {
+    "type": "<",
     "named": false
   },
   {
     "type": "=",
     "named": false
+  },
+  {
+    "type": ">",
+    "named": false
+  },
+  {
+    "type": "axioms",
+    "named": false
+  },
+  {
+    "type": "bool_set",
+    "named": true
+  },
+  {
+    "type": "builtin",
+    "named": true
   },
   {
     "type": "comment",
@@ -226,6 +1145,10 @@
     "named": false
   },
   {
+    "type": "empty_set",
+    "named": true
+  },
+  {
     "type": "end",
     "named": false
   },
@@ -234,12 +1157,40 @@
     "named": false
   },
   {
+    "type": "false",
+    "named": true
+  },
+  {
     "type": "identifier",
+    "named": true
+  },
+  {
+    "type": "integer_set",
+    "named": true
+  },
+  {
+    "type": "invariants",
+    "named": false
+  },
+  {
+    "type": "label",
     "named": true
   },
   {
     "type": "machine",
     "named": false
+  },
+  {
+    "type": "natural1_set",
+    "named": true
+  },
+  {
+    "type": "natural_set",
+    "named": true
+  },
+  {
+    "type": "number",
+    "named": true
   },
   {
     "type": "refines",
@@ -254,6 +1205,22 @@
     "named": false
   },
   {
+    "type": "string",
+    "named": true
+  },
+  {
+    "type": "theorem",
+    "named": false
+  },
+  {
+    "type": "theorems",
+    "named": false
+  },
+  {
+    "type": "true",
+    "named": true
+  },
+  {
     "type": "variables",
     "named": false
   },
@@ -263,6 +1230,78 @@
   },
   {
     "type": "}",
+    "named": false
+  },
+  {
+    "type": "¬",
+    "named": false
+  },
+  {
+    "type": "·",
+    "named": false
+  },
+  {
+    "type": "⇒",
+    "named": false
+  },
+  {
+    "type": "⇔",
+    "named": false
+  },
+  {
+    "type": "∀",
+    "named": false
+  },
+  {
+    "type": "∃",
+    "named": false
+  },
+  {
+    "type": "∈",
+    "named": false
+  },
+  {
+    "type": "∉",
+    "named": false
+  },
+  {
+    "type": "∧",
+    "named": false
+  },
+  {
+    "type": "∨",
+    "named": false
+  },
+  {
+    "type": "≠",
+    "named": false
+  },
+  {
+    "type": "≤",
+    "named": false
+  },
+  {
+    "type": "≥",
+    "named": false
+  },
+  {
+    "type": "⊂",
+    "named": false
+  },
+  {
+    "type": "⊄",
+    "named": false
+  },
+  {
+    "type": "⊆",
+    "named": false
+  },
+  {
+    "type": "⊈",
+    "named": false
+  },
+  {
+    "type": "⦂",
     "named": false
   }
 ]
