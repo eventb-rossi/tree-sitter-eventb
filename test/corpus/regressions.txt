@@ -191,3 +191,208 @@ end
         predicate: (comparison_predicate
           left: (identifier)
           right: (set_enumeration))))))
+
+================================================================================
+maplet binds tighter than relation arrows and oftype (rossi ladder)
+================================================================================
+
+context C
+  axioms
+    @a t = a ↦ b ↔ c
+    @b u = a ↦ b ⦂ T
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    (identifier)
+    (axioms_clause
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (identifier))
+            (identifier))))
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (identifier))
+            (identifier)))))))
+
+================================================================================
+hyphenated event names and refinement targets (Rodin-emitted)
+================================================================================
+
+machine M
+  events
+    event computing-computing refines prepost-computing
+      then
+        @a x ≔ 1
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    (identifier)
+    (events_clause
+      (event
+        (component_name
+          (identifier))
+        (component_name
+          (identifier))
+        (then_clause
+          (action
+            (label)
+            (assignment
+              (identifier)
+              (number))))))))
+
+================================================================================
+event refines may follow the status clause (grammar.pest event_body)
+================================================================================
+
+machine M
+  events
+    event e status convergent refines f
+      then
+        @a x ≔ 1
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    (identifier)
+    (events_clause
+      (event
+        (identifier)
+        (status_clause)
+        (identifier)
+        (then_clause
+          (action
+            (label)
+            (assignment
+              (identifier)
+              (number))))))))
+
+================================================================================
+postfix application heads: literals, bool conversion, IF expression
+================================================================================
+
+context C
+  axioms
+    @a x = bool(y > 0)(1)
+    @b z = if y > 0 then f else g end(1)
+    @c w = 5(1)
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    (identifier)
+    (axioms_clause
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (function_application
+            (bool_conversion
+              (comparison_predicate
+                (identifier)
+                (number)))
+            (number))))
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (function_application
+            (if_expression
+              (comparison_predicate
+                (identifier)
+                (number))
+              (identifier)
+              (identifier))
+            (number))))
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (function_application
+            (number)
+            (number)))))))
+
+================================================================================
+operator words as identifiers: dom, ran, pow, not, if, theorem
+================================================================================
+
+machine M
+  variables dom ran pow
+  invariants
+    @i1 dom ∈ ℕ
+    theorem ∈ ℕ
+  events
+    event e any if where
+      @g if > 0
+    then
+      @a dom ≔ ran(f)
+      @b not ≔ pow + 1
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    (identifier)
+    (variables_clause
+      (identifier)
+      (identifier)
+      (identifier))
+    (invariants_clause
+      (invariant
+        (label)
+        (comparison_predicate
+          (identifier)
+          (natural_set)))
+      (invariant
+        (comparison_predicate
+          (identifier)
+          (natural_set))))
+    (events_clause
+      (event
+        (identifier)
+        (any_clause
+          (identifier))
+        (where_clause
+          (guard
+            (label)
+            (comparison_predicate
+              (identifier)
+              (number))))
+        (then_clause
+          (action
+            (label)
+            (assignment
+              (identifier)
+              (unary_expression
+                (parenthesized_expression
+                  (identifier)))))
+          (action
+            (label)
+            (assignment
+              (identifier)
+              (binary_expression
+                (identifier)
+                (number)))))))))
