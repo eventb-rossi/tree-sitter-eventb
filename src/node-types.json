@@ -1,5 +1,149 @@
 [
   {
+    "type": "_expression",
+    "named": true,
+    "subtypes": [
+      {
+        "type": "binary_expression",
+        "named": true
+      },
+      {
+        "type": "bool_conversion",
+        "named": true
+      },
+      {
+        "type": "bool_set",
+        "named": true
+      },
+      {
+        "type": "builtin",
+        "named": true
+      },
+      {
+        "type": "empty_set",
+        "named": true
+      },
+      {
+        "type": "false",
+        "named": true
+      },
+      {
+        "type": "function_application",
+        "named": true
+      },
+      {
+        "type": "function_override",
+        "named": true
+      },
+      {
+        "type": "identifier",
+        "named": true
+      },
+      {
+        "type": "if_expression",
+        "named": true
+      },
+      {
+        "type": "integer_set",
+        "named": true
+      },
+      {
+        "type": "inverse_expression",
+        "named": true
+      },
+      {
+        "type": "lambda_expression",
+        "named": true
+      },
+      {
+        "type": "natural1_set",
+        "named": true
+      },
+      {
+        "type": "natural_set",
+        "named": true
+      },
+      {
+        "type": "number",
+        "named": true
+      },
+      {
+        "type": "parenthesized_expression",
+        "named": true
+      },
+      {
+        "type": "quantified_inter",
+        "named": true
+      },
+      {
+        "type": "quantified_union",
+        "named": true
+      },
+      {
+        "type": "relational_image",
+        "named": true
+      },
+      {
+        "type": "set_comprehension",
+        "named": true
+      },
+      {
+        "type": "set_enumeration",
+        "named": true
+      },
+      {
+        "type": "string",
+        "named": true
+      },
+      {
+        "type": "true",
+        "named": true
+      },
+      {
+        "type": "unary_expression",
+        "named": true
+      }
+    ]
+  },
+  {
+    "type": "_predicate",
+    "named": true,
+    "subtypes": [
+      {
+        "type": "binary_predicate",
+        "named": true
+      },
+      {
+        "type": "comparison_predicate",
+        "named": true
+      },
+      {
+        "type": "false",
+        "named": true
+      },
+      {
+        "type": "function_application",
+        "named": true
+      },
+      {
+        "type": "not_predicate",
+        "named": true
+      },
+      {
+        "type": "parenthesized_predicate",
+        "named": true
+      },
+      {
+        "type": "quantified_predicate",
+        "named": true
+      },
+      {
+        "type": "true",
+        "named": true
+      }
+    ]
+  },
+  {
     "type": "action",
     "named": true,
     "fields": {
@@ -76,103 +220,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -198,35 +246,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -267,103 +287,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -389,35 +313,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -433,103 +329,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -677,103 +477,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -789,35 +493,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -849,35 +525,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -893,35 +541,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -942,103 +562,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -1102,103 +626,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -1308,6 +736,10 @@
         "required": false,
         "types": [
           {
+            "type": "component_name",
+            "named": true
+          },
+          {
             "type": "identifier",
             "named": true
           }
@@ -1318,6 +750,10 @@
         "required": true,
         "types": [
           {
+            "type": "component_name",
+            "named": true
+          },
+          {
             "type": "identifier",
             "named": true
           }
@@ -1327,6 +763,10 @@
         "multiple": false,
         "required": false,
         "types": [
+          {
+            "type": "component_name",
+            "named": true
+          },
           {
             "type": "identifier",
             "named": true
@@ -1408,9 +848,15 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
+            "type": "_expression",
             "named": true
-          },
+          }
+        ]
+      },
+      "function": {
+        "multiple": false,
+        "required": true,
+        "types": [
           {
             "type": "bool_conversion",
             "named": true
@@ -1456,10 +902,6 @@
             "named": true
           },
           {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
             "type": "natural1_set",
             "named": true
           },
@@ -1473,14 +915,6 @@
           },
           {
             "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
             "named": true
           },
           {
@@ -1502,52 +936,6 @@
           {
             "type": "true",
             "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          }
-        ]
-      },
-      "function": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
           }
         ]
       }
@@ -1562,7 +950,23 @@
         "required": true,
         "types": [
           {
+            "type": "bool_conversion",
+            "named": true
+          },
+          {
+            "type": "bool_set",
+            "named": true
+          },
+          {
             "type": "builtin",
+            "named": true
+          },
+          {
+            "type": "empty_set",
+            "named": true
+          },
+          {
+            "type": "false",
             "named": true
           },
           {
@@ -1578,7 +982,27 @@
             "named": true
           },
           {
+            "type": "if_expression",
+            "named": true
+          },
+          {
+            "type": "integer_set",
+            "named": true
+          },
+          {
             "type": "inverse_expression",
+            "named": true
+          },
+          {
+            "type": "natural1_set",
+            "named": true
+          },
+          {
+            "type": "natural_set",
+            "named": true
+          },
+          {
+            "type": "number",
             "named": true
           },
           {
@@ -1596,6 +1020,14 @@
           {
             "type": "set_enumeration",
             "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": true
           }
         ]
       }
@@ -1605,103 +1037,7 @@
       "required": true,
       "types": [
         {
-          "type": "binary_expression",
-          "named": true
-        },
-        {
-          "type": "bool_conversion",
-          "named": true
-        },
-        {
-          "type": "bool_set",
-          "named": true
-        },
-        {
-          "type": "builtin",
-          "named": true
-        },
-        {
-          "type": "empty_set",
-          "named": true
-        },
-        {
-          "type": "false",
-          "named": true
-        },
-        {
-          "type": "function_application",
-          "named": true
-        },
-        {
-          "type": "function_override",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_expression",
-          "named": true
-        },
-        {
-          "type": "integer_set",
-          "named": true
-        },
-        {
-          "type": "inverse_expression",
-          "named": true
-        },
-        {
-          "type": "lambda_expression",
-          "named": true
-        },
-        {
-          "type": "natural1_set",
-          "named": true
-        },
-        {
-          "type": "natural_set",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parenthesized_expression",
-          "named": true
-        },
-        {
-          "type": "quantified_inter",
-          "named": true
-        },
-        {
-          "type": "quantified_union",
-          "named": true
-        },
-        {
-          "type": "relational_image",
-          "named": true
-        },
-        {
-          "type": "set_comprehension",
-          "named": true
-        },
-        {
-          "type": "set_enumeration",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "true",
-          "named": true
-        },
-        {
-          "type": "unary_expression",
+          "type": "_expression",
           "named": true
         }
       ]
@@ -1726,35 +1062,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -1770,103 +1078,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -1876,35 +1088,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -1914,103 +1098,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -2036,35 +1124,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -2095,103 +1155,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -2207,103 +1171,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -2313,35 +1181,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -2452,35 +1292,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -2506,103 +1318,7 @@
       "required": true,
       "types": [
         {
-          "type": "binary_expression",
-          "named": true
-        },
-        {
-          "type": "bool_conversion",
-          "named": true
-        },
-        {
-          "type": "bool_set",
-          "named": true
-        },
-        {
-          "type": "builtin",
-          "named": true
-        },
-        {
-          "type": "empty_set",
-          "named": true
-        },
-        {
-          "type": "false",
-          "named": true
-        },
-        {
-          "type": "function_application",
-          "named": true
-        },
-        {
-          "type": "function_override",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_expression",
-          "named": true
-        },
-        {
-          "type": "integer_set",
-          "named": true
-        },
-        {
-          "type": "inverse_expression",
-          "named": true
-        },
-        {
-          "type": "lambda_expression",
-          "named": true
-        },
-        {
-          "type": "natural1_set",
-          "named": true
-        },
-        {
-          "type": "natural_set",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parenthesized_expression",
-          "named": true
-        },
-        {
-          "type": "quantified_inter",
-          "named": true
-        },
-        {
-          "type": "quantified_union",
-          "named": true
-        },
-        {
-          "type": "relational_image",
-          "named": true
-        },
-        {
-          "type": "set_comprehension",
-          "named": true
-        },
-        {
-          "type": "set_enumeration",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "true",
-          "named": true
-        },
-        {
-          "type": "unary_expression",
+          "type": "_expression",
           "named": true
         }
       ]
@@ -2617,35 +1333,7 @@
       "required": true,
       "types": [
         {
-          "type": "binary_predicate",
-          "named": true
-        },
-        {
-          "type": "comparison_predicate",
-          "named": true
-        },
-        {
-          "type": "false",
-          "named": true
-        },
-        {
-          "type": "function_application",
-          "named": true
-        },
-        {
-          "type": "not_predicate",
-          "named": true
-        },
-        {
-          "type": "parenthesized_predicate",
-          "named": true
-        },
-        {
-          "type": "quantified_predicate",
-          "named": true
-        },
-        {
-          "type": "true",
+          "type": "_predicate",
           "named": true
         }
       ]
@@ -2670,103 +1358,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -2776,35 +1368,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -2830,35 +1394,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -2898,103 +1434,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -3004,35 +1444,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -3068,103 +1480,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -3174,103 +1490,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -3315,103 +1535,7 @@
         "required": false,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -3421,35 +1545,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -3459,103 +1555,7 @@
         "required": false,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -3597,103 +1597,7 @@
       "required": false,
       "types": [
         {
-          "type": "binary_expression",
-          "named": true
-        },
-        {
-          "type": "bool_conversion",
-          "named": true
-        },
-        {
-          "type": "bool_set",
-          "named": true
-        },
-        {
-          "type": "builtin",
-          "named": true
-        },
-        {
-          "type": "empty_set",
-          "named": true
-        },
-        {
-          "type": "false",
-          "named": true
-        },
-        {
-          "type": "function_application",
-          "named": true
-        },
-        {
-          "type": "function_override",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_expression",
-          "named": true
-        },
-        {
-          "type": "integer_set",
-          "named": true
-        },
-        {
-          "type": "inverse_expression",
-          "named": true
-        },
-        {
-          "type": "lambda_expression",
-          "named": true
-        },
-        {
-          "type": "natural1_set",
-          "named": true
-        },
-        {
-          "type": "natural_set",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parenthesized_expression",
-          "named": true
-        },
-        {
-          "type": "quantified_inter",
-          "named": true
-        },
-        {
-          "type": "quantified_union",
-          "named": true
-        },
-        {
-          "type": "relational_image",
-          "named": true
-        },
-        {
-          "type": "set_comprehension",
-          "named": true
-        },
-        {
-          "type": "set_enumeration",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "true",
-          "named": true
-        },
-        {
-          "type": "unary_expression",
+          "type": "_expression",
           "named": true
         }
       ]
@@ -3792,35 +1696,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]
@@ -3861,103 +1737,7 @@
         "required": false,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -3973,103 +1753,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -4126,103 +1810,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "bool_conversion",
-            "named": true
-          },
-          {
-            "type": "bool_set",
-            "named": true
-          },
-          {
-            "type": "builtin",
-            "named": true
-          },
-          {
-            "type": "empty_set",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "function_override",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "integer_set",
-            "named": true
-          },
-          {
-            "type": "inverse_expression",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
-            "type": "natural1_set",
-            "named": true
-          },
-          {
-            "type": "natural_set",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "quantified_inter",
-            "named": true
-          },
-          {
-            "type": "quantified_union",
-            "named": true
-          },
-          {
-            "type": "relational_image",
-            "named": true
-          },
-          {
-            "type": "set_comprehension",
-            "named": true
-          },
-          {
-            "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -4278,35 +1866,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_predicate",
-            "named": true
-          },
-          {
-            "type": "comparison_predicate",
-            "named": true
-          },
-          {
-            "type": "false",
-            "named": true
-          },
-          {
-            "type": "function_application",
-            "named": true
-          },
-          {
-            "type": "not_predicate",
-            "named": true
-          },
-          {
-            "type": "parenthesized_predicate",
-            "named": true
-          },
-          {
-            "type": "quantified_predicate",
-            "named": true
-          },
-          {
-            "type": "true",
+            "type": "_predicate",
             "named": true
           }
         ]

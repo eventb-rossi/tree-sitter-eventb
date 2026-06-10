@@ -39,6 +39,15 @@ function kw(word) {
   return alias(token(ci(word)), word);
 }
 
+/**
+ * The canonical spelling of an operator plus its variant spellings (ASCII
+ * forms, Rodin private-use code points, case-insensitive words), each aliased
+ * to the canonical one so consumers and queries see a single spelling.
+ */
+function op(canonical, ...variants) {
+  return choice(canonical, ...variants.map((v) => alias(v, canonical)));
+}
+
 /** One or more `rule`s separated by optional commas (identifier lists). */
 function spaceSep1(rule) {
   return seq(rule, repeat(seq(optional(','), rule)));
@@ -47,6 +56,34 @@ function spaceSep1(rule) {
 /** One or more `rule`s separated by mandatory commas. */
 function commaSep1(rule) {
   return seq(rule, repeat(seq(',', rule)));
+}
+
+/** A clause keyword holding labeled predicates surfaced as `item` nodes. */
+function labeledClause($, keyword, item) {
+  return seq(keyword, repeat1(alias($.labeled_predicate, item)));
+}
+
+/** A bound variable with an optional ⦂ type annotation. */
+function typedBinder($) {
+  return seq(
+    field('name', $.identifier),
+    optional(seq(op('⦂', ci('oftype')), field('type', $._expression))),
+  );
+}
+
+/** A quantified set operation: ⋃/⋂ binders · P ∣ E. */
+function quantifiedSetOp($, operator) {
+  return prec.right(
+    EXPR.quantified,
+    seq(
+      operator,
+      commaSep1(field('binder', $.typed_identifier)),
+      $._dot,
+      field('condition', $._predicate),
+      $._pipe,
+      field('body', $._expression),
+    ),
+  );
 }
 
 // Predicate precedence, lowest → highest (kernel_lang §3.2.4). Quantifier
@@ -63,7 +100,13 @@ const PRED = {
   negation: 6,
 };
 
-// Expression precedence, lowest → highest (kernel_lang §3.3.4, Table 3.1).
+// Expression precedence, lowest → highest (kernel_lang §3.3.4, Table 3.1),
+// except that the relation arrows and ⦂ bind looser than ↦, matching rossi's
+// grammar.pest (relation_type_expr wraps maplet_expr): `a ↦ b ↔ c` is
+// `(a ↦ b) ↔ c`. Note kernel_lang Table 3.1 orders these two levels the
+// other way around — rossi diverges from the spec there, and rossi's own
+// formatter emits maplet–arrow mixes unparenthesized, so only rossi's ladder
+// round-trips rossi-produced text.
 // Like rossi, levels the spec declares non-associative (relation arrows,
 // interval, exponent) parse left-associated chains permissively; the set
 // operator compatibility matrix (Table 3.2) is likewise a semantic check,
@@ -71,8 +114,8 @@ const PRED = {
 // grammar.pest (`-a^b` is `(-a)^b`) rather than the spec's arithmetic level.
 const EXPR = {
   quantified: 1,
-  maplet: 2,
-  arrow: 3,
+  arrow: 2,
+  maplet: 3,
   setop: 4,
   interval: 5,
   additive: 6,
@@ -94,18 +137,33 @@ export default grammar({
   // elsewhere. This is what makes keywords reserved words.
   word: ($) => $.identifier,
 
+  // Hidden choice rules exposed as supertypes in node-types.json, so query
+  // authors and typed-binding generators can say "any expression" without
+  // enumerating (and drifting from) the alternatives.
+  supertypes: ($) => [$._expression, $._predicate],
+
   conflicts: ($) => [
     // Predicates and expressions share atoms (true/false, parentheses): in
     // `(true)` the parser cannot know locally whether it is closing a
     // parenthesized predicate or a parenthesized expression that a relational
     // operator will follow. GLR keeps both readings until one completes.
     [$._predicate, $._expression],
+    // The same atoms are also postfix heads (`TRUE(x)`, `bool(P)(x)`), so the
+    // head reading stays alive alongside both of the above.
+    [$._predicate, $._postfix_head],
+    [$._expression, $._postfix_head],
     // In `{x, …` an identifier is either a comprehension binder or the first
     // element of a set enumeration (or the expression form's element).
     [$.typed_identifier, $._expression],
     // `bool` followed by `(` is a predicate-to-BOOL conversion, but `bool`
     // is also the BOOL type literal.
     [$.bool_conversion, $.bool_set],
+    // `if` opens an IF/THEN/ELSE expression or names an identifier (rossi
+    // backtracks); the continuation decides.
+    [$._identifier_like, $.if_expression],
+    // `theorem` after a label flags the predicate, or starts it as an
+    // identifier expression.
+    [$._identifier_like, $.labeled_predicate],
     // An action's identifier list is shared by all three assignment forms
     // until the operator (≔, :∈, :∣) decides among them.
     [$.assignment, $.becomes_member, $.becomes_such],
@@ -157,14 +215,12 @@ export default grammar({
 
     constants_clause: ($) => seq(kw('constants'), spaceSep1($.identifier)),
 
-    axioms_clause: ($) =>
-      seq(kw('axioms'), repeat1(alias($.labeled_predicate, $.axiom))),
+    axioms_clause: ($) => labeledClause($, kw('axioms'), $.axiom),
 
     // A THEOREMS section holds theorem-flagged axioms (in a context) or
     // invariants (in a machine); Rodin models the flag as an attribute, not a
     // separate container.
-    theorems_clause: ($) =>
-      seq(kw('theorems'), repeat1(alias($.labeled_predicate, $.theorem))),
+    theorems_clause: ($) => labeledClause($, kw('theorems'), $.theorem),
 
     // ==========================
     // Machine
@@ -196,8 +252,7 @@ export default grammar({
 
     variables_clause: ($) => seq(kw('variables'), spaceSep1($.identifier)),
 
-    invariants_clause: ($) =>
-      seq(kw('invariants'), repeat1(alias($.labeled_predicate, $.invariant))),
+    invariants_clause: ($) => labeledClause($, kw('invariants'), $.invariant),
 
     variant_clause: ($) =>
       seq(kw('variant'), field('expression', $._expression)),
@@ -210,34 +265,41 @@ export default grammar({
 
     // The INITIALISATION event needs no special rule: its name parses as a
     // plain identifier (there is no `initialisation` keyword token to shadow
-    // it).
+    // it). Event names and refinement targets are Rodin event labels, which
+    // may be hyphenated like component names. The sub-clauses follow
+    // grammar.pest: refines/extends may follow the name directly, or refines
+    // (only) may follow a status clause (event_body); the remaining clauses
+    // come in a fixed order, each at most once.
     event: ($) =>
       seq(
         optional(field('convergence', $._convergence)),
         kw('event'),
-        field('name', $.identifier),
+        field('name', $._component_name),
         optional(
           choice(
-            seq(kw('refines'), field('refines', $.identifier)),
-            seq(kw('extends'), field('extends', $.identifier)),
+            seq(
+              choice(
+                seq(kw('refines'), field('refines', $._component_name)),
+                seq(kw('extends'), field('extends', $._component_name)),
+              ),
+              optional($.status_clause),
+            ),
+            seq(
+              $.status_clause,
+              optional(seq(kw('refines'), field('refines', $._component_name))),
+            ),
           ),
         ),
-        repeat($._event_clause),
+        optional($.any_clause),
+        optional($.where_clause),
+        optional($.with_clause),
+        optional($.witness_clause),
+        optional($.then_clause),
         kw('end'),
       ),
 
     _convergence: ($) =>
       choice(kw('ordinary'), kw('convergent'), kw('anticipated')),
-
-    _event_clause: ($) =>
-      choice(
-        $.status_clause,
-        $.any_clause,
-        $.where_clause,
-        $.with_clause,
-        $.witness_clause,
-        $.then_clause,
-      ),
 
     status_clause: ($) =>
       seq(kw('status'), field('convergence', $._convergence)),
@@ -246,18 +308,13 @@ export default grammar({
       seq(kw('any'), spaceSep1(field('parameter', $.identifier))),
 
     where_clause: ($) =>
-      seq(
-        choice(kw('where'), kw('when')),
-        repeat1(alias($.labeled_predicate, $.guard)),
-      ),
+      labeledClause($, choice(kw('where'), kw('when')), $.guard),
 
     // WITH gives witnesses for refined variables, WITNESS for abstract
     // parameters; both hold labeled predicates.
-    with_clause: ($) =>
-      seq(kw('with'), repeat1(alias($.labeled_predicate, $.witness))),
+    with_clause: ($) => labeledClause($, kw('with'), $.witness),
 
-    witness_clause: ($) =>
-      seq(kw('witness'), repeat1(alias($.labeled_predicate, $.witness))),
+    witness_clause: ($) => labeledClause($, kw('witness'), $.witness),
 
     then_clause: ($) =>
       seq(choice(kw('then'), kw('begin')), repeat1($.action)),
@@ -275,27 +332,33 @@ export default grammar({
     skip: ($) => token(ci('skip')),
 
     // Deterministic (parallel) assignment x, y ≔ E, F and functional
-    // override f(x) ≔ E.
+    // override f(x) ≔ E. The assigned variables are identifiers (including
+    // the operator-word fallbacks: a variable may be named `dom`).
     assignment: ($) =>
       seq(
-        commaSep1(field('left', choice($.identifier, $.function_application))),
-        choice('≔', alias(':=', '≔')),
+        commaSep1(
+          field(
+            'left',
+            choice($.identifier, $._identifier_like, $.function_application),
+          ),
+        ),
+        op('≔', ':='),
         commaSep1(field('right', $._expression)),
       ),
 
     // Non-deterministic: becomes member of a set.
     becomes_member: ($) =>
       seq(
-        commaSep1(field('left', $.identifier)),
-        choice(':∈', alias('::', ':∈')),
+        commaSep1(field('left', choice($.identifier, $._identifier_like))),
+        op(':∈', '::'),
         field('right', $._expression),
       ),
 
     // Non-deterministic: becomes such that a predicate holds.
     becomes_such: ($) =>
       seq(
-        commaSep1(field('left', $.identifier)),
-        choice(':∣', alias(':|', ':∣')),
+        commaSep1(field('left', choice($.identifier, $._identifier_like))),
+        op(':∣', ':|'),
         field('predicate', $._predicate),
       ),
 
@@ -338,7 +401,7 @@ export default grammar({
       prec.right(
         PRED.quantified,
         seq(
-          field('quantifier', choice('∀', alias('!', '∀'), '∃', alias('#', '∃'))),
+          field('quantifier', choice(op('∀', '!'), op('∃', '#'))),
           commaSep1(field('binder', $.typed_identifier)),
           $._dot,
           field('body', $._predicate),
@@ -347,10 +410,10 @@ export default grammar({
 
     binary_predicate: ($) => {
       const table = [
-        [PRED.equivalence, choice('⇔', alias('<=>', '⇔'))],
-        [PRED.implication, choice('⇒', alias('=>', '⇒'))],
-        [PRED.disjunction, choice('∨', alias(ci('or'), '∨'))],
-        [PRED.conjunction, choice('∧', alias('&', '∧'))],
+        [PRED.equivalence, op('⇔', '<=>')],
+        [PRED.implication, op('⇒', '=>')],
+        [PRED.disjunction, op('∨', ci('or'))],
+        [PRED.conjunction, op('∧', '&')],
       ];
       return choice(
         ...table.map(([level, operator]) =>
@@ -366,12 +429,17 @@ export default grammar({
       );
     },
 
+    // The dynamic precedence prefers the operator reading when `not` could
+    // also start an identifier expression, matching pest's alternative order.
     not_predicate: ($) =>
       prec(
         PRED.negation,
-        seq(
-          field('operator', choice('¬', alias(ci('not'), '¬'))),
-          field('operand', $._predicate),
+        prec.dynamic(
+          1,
+          seq(
+            field('operator', op('¬', ci('not'))),
+            field('operand', $._predicate),
+          ),
         ),
       ),
 
@@ -382,17 +450,17 @@ export default grammar({
         field('left', $._expression),
         field('operator', choice(
           '=',
-          choice('≠', alias('/=', '≠')),
-          choice('≤', alias('<=', '≤')),
-          choice('≥', alias('>=', '≥')),
+          op('≠', '/='),
+          op('≤', '<='),
+          op('≥', '>='),
           '<',
           '>',
-          choice('∈', alias(':', '∈')),
-          choice('∉', alias('/:', '∉')),
-          choice('⊂', alias('<<:', '⊂')),
-          choice('⊄', alias('/<<:', '⊄')),
-          choice('⊆', alias('<:', '⊆')),
-          choice('⊈', alias('/<:', '⊈')),
+          op('∈', ':'),
+          op('∉', '/:'),
+          op('⊂', '<<:'),
+          op('⊄', '/<<:'),
+          op('⊆', '<:'),
+          op('⊈', '/<:'),
         )),
         field('right', $._expression),
       ),
@@ -401,16 +469,7 @@ export default grammar({
 
     // Bound variable with optional type annotation: x⦂T (Rodin's bcc output
     // spells types this way after type-checking).
-    typed_identifier: ($) =>
-      seq(
-        field('name', $.identifier),
-        optional(
-          seq(
-            choice('⦂', alias(ci('oftype'), '⦂')),
-            field('type', $._expression),
-          ),
-        ),
-      ),
+    typed_identifier: ($) => typedBinder($),
 
     // ==========================
     // Expressions
@@ -446,59 +505,73 @@ export default grammar({
         $._identifier_like,
       ),
 
-    // `union` and `inter` are operators only when a quantified form follows;
-    // otherwise they are ordinary identifiers, like in rossi, where the PEG
-    // backtracks (the generalized union of kernel_lang, union(S), is an
-    // identifier application there too). Capitalised spellings like `Union`
-    // are real identifiers in published models.
+    // Words that are operators only in specific forms fall back to ordinary
+    // identifiers elsewhere, like in rossi, where the PEG backtracks: `union`
+    // and `inter` are operators only when a quantified form follows (the
+    // generalized union of kernel_lang, union(S), is an identifier
+    // application there too; capitalised spellings like `Union` are real
+    // identifiers in published models), and dom/ran/pow/pow1/not/if/theorem
+    // likewise name constants or variables in rossi-valid models. GLR keeps
+    // both readings alive until the continuation decides; dynamic precedence
+    // on the operator rules prefers the operator reading on ties, matching
+    // pest's alternative order.
     _identifier_like: ($) =>
       choice(
         alias(ci('union'), $.identifier),
         alias(ci('inter'), $.identifier),
+        alias(ci('dom'), $.identifier),
+        alias(ci('ran'), $.identifier),
+        alias(ci('pow'), $.identifier),
+        alias(ci('pow1'), $.identifier),
+        alias(ci('not'), $.identifier),
+        alias(ci('if'), $.identifier),
+        alias(ci('theorem'), $.identifier),
       ),
 
     binary_expression: ($) => {
-      // [level, operator] — ASCII spellings alias to the canonical Unicode
+      // [level, operator] — variant spellings alias to the canonical
       // operator, so consumers and queries see a single spelling. U+E100–E103
-      // are the Rodin private-use code points for ⤨-style relation arrows and
-      // relational override.
+      // are the Rodin private-use code points for the relation-set arrows and
+      // relational override; the first three have no real Unicode equivalent,
+      // so their ASCII spellings are the canonical ones.
       const table = [
+        // Set-of-relations constructors (and rossi's ⦂ type ascription),
+        // loosest after quantification — see the EXPR comment above.
+        [EXPR.arrow, op('↔', '<->')],
+        [EXPR.arrow, op('<<->', '')],
+        [EXPR.arrow, op('<->>', '')],
+        [EXPR.arrow, op('<<->>', '')],
+        [EXPR.arrow, op('⇸', '+->')],
+        [EXPR.arrow, op('→', '-->')],
+        [EXPR.arrow, op('⤔', '>+>')],
+        [EXPR.arrow, op('↣', '>->')],
+        [EXPR.arrow, op('⤀', '+>>')],
+        [EXPR.arrow, op('↠', '->>')],
+        [EXPR.arrow, op('⤖', '>->>')],
+        [EXPR.arrow, op('⦂', ci('oftype'))],
         // Pair constructor (maplet), left-associative.
-        [EXPR.maplet, choice('↦', alias('|->', '↦'))],
-        // Set-of-relations constructors (and rossi's ⦂ type ascription).
-        [EXPR.arrow, choice('↔', alias('<->', '↔'))],
-        [EXPR.arrow, choice(alias('', '<<->'), '<<->')],
-        [EXPR.arrow, choice(alias('', '<->>'), '<->>')],
-        [EXPR.arrow, choice(alias('', '<<->>'), '<<->>')],
-        [EXPR.arrow, choice('⇸', alias('+->', '⇸'))],
-        [EXPR.arrow, choice('→', alias('-->', '→'))],
-        [EXPR.arrow, choice('⤔', alias('>+>', '⤔'))],
-        [EXPR.arrow, choice('↣', alias('>->', '↣'))],
-        [EXPR.arrow, choice('⤀', alias('+>>', '⤀'))],
-        [EXPR.arrow, choice('↠', alias('->>', '↠'))],
-        [EXPR.arrow, choice('⤖', alias('>->>', '⤖'))],
-        [EXPR.arrow, choice('⦂', alias(ci('oftype'), '⦂'))],
+        [EXPR.maplet, op('↦', '|->')],
         // Binary set operators.
-        [EXPR.setop, choice('∪', alias('\\/', '∪'))],
-        [EXPR.setop, choice('∩', alias('/\\', '∩'))],
-        [EXPR.setop, choice('∖', alias('\\', '∖'))],
-        [EXPR.setop, choice('×', alias('**', '×'))],
+        [EXPR.setop, op('∪', '\\/')],
+        [EXPR.setop, op('∩', '/\\')],
+        [EXPR.setop, op('∖', '\\')],
+        [EXPR.setop, op('×', '**')],
         [EXPR.setop, ';'],
-        [EXPR.setop, choice('∘', alias(ci('circ'), '∘'))],
-        [EXPR.setop, choice('⊕', alias('', '⊕'), alias('<+', '⊕'))],
-        [EXPR.setop, choice('◁', alias('<|', '◁'))],
-        [EXPR.setop, choice('⩤', alias('<<|', '⩤'))],
-        [EXPR.setop, choice('▷', alias('|>', '▷'))],
-        [EXPR.setop, choice('⩥', alias('|>>', '⩥'))],
-        [EXPR.setop, choice('⊗', alias('><', '⊗'))],
-        [EXPR.setop, choice('∥', alias('||', '∥'))],
+        [EXPR.setop, op('∘', ci('circ'))],
+        [EXPR.setop, op('⊕', '', '<+')],
+        [EXPR.setop, op('◁', '<|')],
+        [EXPR.setop, op('⩤', '<<|')],
+        [EXPR.setop, op('▷', '|>')],
+        [EXPR.setop, op('⩥', '|>>')],
+        [EXPR.setop, op('⊗', '><')],
+        [EXPR.setop, op('∥', '||')],
         // Interval constructor.
-        [EXPR.interval, choice('‥', alias('..', '‥'))],
+        [EXPR.interval, op('‥', '..')],
         // Arithmetic.
         [EXPR.additive, '+'],
-        [EXPR.additive, choice('−', alias('-', '−'))],
-        [EXPR.multiplicative, choice('∗', alias('*', '∗'))],
-        [EXPR.multiplicative, choice('÷', alias('/', '÷'))],
+        [EXPR.additive, op('−', '-')],
+        [EXPR.multiplicative, op('∗', '*')],
+        [EXPR.multiplicative, op('÷', '/')],
         [EXPR.multiplicative, alias(ci('mod'), 'mod')],
         [EXPR.exponent, '^'],
       ];
@@ -516,18 +589,24 @@ export default grammar({
       );
     },
 
+    // The dynamic precedence prefers the operator reading of dom/ran/pow/pow1
+    // over an identifier application when both complete (`dom(S)`), matching
+    // pest's alternative order.
     unary_expression: ($) =>
       prec(
         EXPR.unary,
-        seq(
-          field('operator', choice(
-            choice('−', alias('-', '−')),
-            choice('ℙ1', alias(ci('pow1'), 'ℙ1')),
-            choice('ℙ', alias(ci('pow'), 'ℙ')),
-            alias(ci('dom'), 'dom'),
-            alias(ci('ran'), 'ran'),
-          )),
-          field('operand', $._expression),
+        prec.dynamic(
+          1,
+          seq(
+            field('operator', choice(
+              op('−', '-'),
+              op('ℙ1', ci('pow1')),
+              op('ℙ', ci('pow')),
+              alias(ci('dom'), 'dom'),
+              alias(ci('ran'), 'ran'),
+            )),
+            field('operand', $._expression),
+          ),
         ),
       ),
 
@@ -535,7 +614,7 @@ export default grammar({
     inverse_expression: ($) =>
       prec.left(
         EXPR.postfix,
-        seq(field('operand', $._expression), choice('∼', alias('~', '∼'))),
+        seq(field('operand', $._expression), op('∼', '~')),
       ),
 
     // Relational image: r[S].
@@ -556,21 +635,7 @@ export default grammar({
       prec.left(
         EXPR.postfix,
         seq(
-          field(
-            'function',
-            choice(
-              $.identifier,
-              $._identifier_like,
-              $.builtin,
-              $.function_application,
-              $.function_override,
-              $.parenthesized_expression,
-              $.inverse_expression,
-              $.relational_image,
-              $.set_enumeration,
-              $.set_comprehension,
-            ),
-          ),
+          field('function', $._postfix_head),
           '{',
           commaSep1($._expression),
           '}',
@@ -591,19 +656,18 @@ export default grammar({
     //   {E | P}          expression form, e.g. {x ↦ y | P}
     // For a single bare identifier the binder and expression forms coincide;
     // dynamic precedence picks the binder reading, like rossi's PEG order.
+    // (The extended form needs no dynamic preference: its mandatory `·`
+    // cannot occur in either competing reading.)
     set_comprehension: ($) =>
       seq(
         '{',
         choice(
-          prec.dynamic(
-            2,
-            seq(
-              commaSep1(field('binder', $.typed_identifier)),
-              $._dot,
-              field('condition', $._predicate),
-              $._pipe,
-              field('body', $._expression),
-            ),
+          seq(
+            commaSep1(field('binder', $.typed_identifier)),
+            $._dot,
+            field('condition', $._predicate),
+            $._pipe,
+            field('body', $._expression),
           ),
           prec.dynamic(
             1,
@@ -629,7 +693,7 @@ export default grammar({
       prec.right(
         EXPR.quantified,
         seq(
-          choice('λ', alias('%', 'λ')),
+          op('λ', '%'),
           field('pattern', $._ident_pattern),
           $._dot,
           field('condition', $._predicate),
@@ -641,13 +705,7 @@ export default grammar({
     _ident_pattern: ($) => choice($.maplet_pattern, $._ident_pattern_atom),
 
     maplet_pattern: ($) =>
-      prec.left(
-        seq(
-          $._ident_pattern,
-          choice('↦', alias('|->', '↦')),
-          $._ident_pattern,
-        ),
-      ),
+      prec.left(seq($._ident_pattern, op('↦', '|->'), $._ident_pattern)),
 
     _ident_pattern_atom: ($) =>
       choice(
@@ -657,48 +715,17 @@ export default grammar({
 
     // A pattern binder's type annotation stops before any top-level ↦, which
     // belongs to the pattern (kernel_lang §3.3.6: types use × and the
-    // relation arrows, never a bare maplet). prec.right at the arrow level
-    // makes ↦ (level 2) reduce out of the type while arrows (level 3) still
-    // extend it: λx⦂ℤ ↦ y⦂BOOL · … binds two variables.
-    pattern_typed_identifier: ($) =>
-      prec.right(
-        EXPR.arrow,
-        seq(
-          field('name', $.identifier),
-          optional(
-            seq(
-              choice('⦂', alias(ci('oftype'), '⦂')),
-              field('type', $._expression),
-            ),
-          ),
-        ),
-      ),
+    // relation arrows, never a bare maplet; rossi's ident_binder_type
+    // likewise excludes ↦). prec.left at the maplet level makes a ↦ after
+    // the type reduce the typed identifier (tie at the maplet level, left →
+    // reduce) so it separates binders; arrows and a nested ⦂ can never follow
+    // a complete pattern, so they extend the type with no conflict:
+    // λx⦂ℤ ↦ y⦂BOOL · … binds two variables, λf⦂ℤ ⇸ ℤ · … binds one.
+    pattern_typed_identifier: ($) => prec.left(EXPR.maplet, typedBinder($)),
 
-    quantified_union: ($) =>
-      prec.right(
-        EXPR.quantified,
-        seq(
-          choice('⋃', alias(ci('union'), '⋃')),
-          commaSep1(field('binder', $.typed_identifier)),
-          $._dot,
-          field('condition', $._predicate),
-          $._pipe,
-          field('body', $._expression),
-        ),
-      ),
+    quantified_union: ($) => quantifiedSetOp($, op('⋃', ci('union'))),
 
-    quantified_inter: ($) =>
-      prec.right(
-        EXPR.quantified,
-        seq(
-          choice('⋂', alias(ci('inter'), '⋂')),
-          commaSep1(field('binder', $.typed_identifier)),
-          $._dot,
-          field('condition', $._predicate),
-          $._pipe,
-          field('body', $._expression),
-        ),
-      ),
+    quantified_inter: ($) => quantifiedSetOp($, op('⋂', ci('inter'))),
 
     // bool(P) converts a predicate to a BOOL value.
     bool_conversion: ($) =>
@@ -721,31 +748,45 @@ export default grammar({
         kw('end'),
       ),
 
-    _dot: ($) => choice('·', alias('.', '·')),
-    _pipe: ($) => choice('∣', alias('|', '∣')),
+    _dot: ($) => op('·', '.'),
+    _pipe: ($) => op('∣', '|'),
 
-    // The function position is an atom or another postfix expression, not an
-    // arbitrary expression: f(x), prj1(s)(t), (E)(x), f∼(x), r[S](x), and
-    // Rodin-emitted set extensions like {TRUE ↦ a, FALSE ↦ b}(x).
+    // What a postfix form may apply to: grammar.pest's primary_expr — atoms,
+    // literals, parenthesized expressions, set constructors, and other
+    // postfix expressions (so postfixes chain: f(x)[S]∼). Quantified forms
+    // participate via parentheses only. Shared by function application and
+    // the override sugar; relational_image and inverse_expression take a
+    // full expression at postfix precedence, which climbing makes equivalent.
+    _postfix_head: ($) =>
+      choice(
+        $.identifier,
+        $._identifier_like,
+        $.builtin,
+        $.number,
+        $.string,
+        $.true,
+        $.false,
+        $.integer_set,
+        $.natural_set,
+        $.natural1_set,
+        $.bool_set,
+        $.empty_set,
+        $.bool_conversion,
+        $.if_expression,
+        $.function_application,
+        $.function_override,
+        $.parenthesized_expression,
+        $.inverse_expression,
+        $.relational_image,
+        $.set_enumeration,
+        $.set_comprehension,
+      ),
+
     function_application: ($) =>
       prec.left(
         EXPR.postfix,
         seq(
-          field(
-            'function',
-            choice(
-              $.identifier,
-              $._identifier_like,
-              $.builtin,
-              $.function_application,
-              $.function_override,
-              $.parenthesized_expression,
-              $.inverse_expression,
-              $.relational_image,
-              $.set_enumeration,
-              $.set_comprehension,
-            ),
-          ),
+          field('function', $._postfix_head),
           '(',
           commaSep1(field('argument', $._expression)),
           ')',
@@ -792,7 +833,8 @@ export default grammar({
     // Per the TextEditor EBNF: all characters following `@` belong to the
     // label until the next whitespace character.
     label: ($) => /@[^\s]+/,
-    string: ($) => token(seq('"', repeat(choice(/[^"\\]/, /\\./)), '"')),
+    // Only \" and \\ escapes, like rossi's string_inner.
+    string: ($) => token(seq('"', repeat(choice(/[^"\\]/, /\\["\\]/)), '"')),
     comment: ($) =>
       token(
         choice(

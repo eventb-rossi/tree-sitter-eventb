@@ -88,7 +88,7 @@ end
               operand: (identifier))))))))
 
 ================================================================================
-maplets are left-associative and loosest below quantification
+maplets are left-associative, between the arrows and the set operators
 ================================================================================
 
 context C
