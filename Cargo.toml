@@ -1,6 +1,6 @@
 [package]
 name = "tree-sitter-eventb"
-description = "Event-B lexical grammar for tree-sitter (Rossi)"
+description = "Event-B grammar for tree-sitter (Rossi)"
 version = "0.1.0"
 authors = ["Rossi Contributors"]
 license = "MIT OR Apache-2.0"

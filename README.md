@@ -15,7 +15,11 @@ prepared for [GitHub Linguist](https://github.com/github-linguist/linguist)
 
 The grammar parses the full Event-B textual language, following Rossi's
 reference parser (`crates/rossi/src/grammar.pest`) and *The Event-B
-Mathematical Language* (Métayer & Voisin, 2009):
+Mathematical Language* (Métayer & Voisin, 2009). Where the two disagree —
+rossi binds the relation arrows looser than `↦`, the reverse of kernel_lang
+Table 3.1 — the grammar follows rossi, whose formatter emits maplet–arrow
+mixes that only its own precedence ladder re-reads correctly. The grammar
+covers:
 
 - **Components**: contexts (`extends`, `sets`, `constants`, `axioms`,
   `theorems`) and machines (`refines`, `sees`, `variables`, `invariants`,
@@ -35,10 +39,13 @@ Mathematical Language* (Métayer & Voisin, 2009):
   Rodin-isms such as `{TRUE ↦ a}(x)` set-extension application and
   `f{x ↦ y}` override sugar.
 
-Every ASCII operator spelling (per the Rodin Keyboard combos, including the
-U+E100–E103 private-use arrows) is **aliased to its canonical Unicode
-operator**, so queries and tree consumers see a single spelling: `<=>`
-parses as the anonymous token `⇔`.
+Every variant operator spelling (per the Rodin Keyboard combos) is **aliased
+to its canonical spelling**, so queries and tree consumers see a single
+token: `<=>` parses as the anonymous token `⇔`. The canonical spelling is
+the Unicode operator — except for the three relation-set arrows that have no
+Unicode equivalent, where the ASCII spelling (`<<->`, `<->>`, `<<->>`) is
+canonical and the Rodin private-use character (U+E100–E102) is the alias;
+U+E103 aliases to `⊕`.
 
 Parsing is permissive where the spec demands semantic checks (operator
 compatibility, non-associative chains, ∧/∨ mixing): those diagnostics belong
@@ -46,11 +53,10 @@ to `rossi-language-server`, which also provides completion, outline, and
 folding over LSP.
 
 The grammar is validated against the rossi example models and the
-[eventb-models-collection](../../../eventb-models-collection) corpus (66
-importable Rodin archives, parsed in both Unicode and ASCII renderings); the
-only files that do not parse are those the reference implementation rejects
-too (models with a constant named `end`, which the textual format cannot
-represent).
+`eventb-models-collection` corpus (66 importable Rodin archives, parsed in
+both Unicode and ASCII renderings); the only files that do not parse are
+those the reference implementation rejects too (models with a constant named
+`end`, which the textual format cannot represent).
 
 ## Relationship to `rossi gen-grammars`
 
@@ -64,10 +70,14 @@ builtins), so the grammar can never silently drop a canonical spelling.
 `grammar.js` and `queries/highlights.scm` are now fully hand-maintained:
 the structural grammar needs individual keyword/operator tokens, not the
 single-token-per-class rules the splice used to inject. The `gen-grammars`
-splice regions for these two files should be retired on the rossi side
-(`rossi-cli/src/commands/{gen_grammars.rs,grammars/zed.rs}`); `tokens.json`
-generation and the verbatim copies (`examples/`, Zed's bundled queries) are
-unaffected.
+splice regions for these two files must be retired on the rossi side
+(`crates/rossi-cli/src/commands/{gen_grammars.rs,grammars/zed.rs}`) together
+with the submodule bump: until then `rossi gen-grammars` aborts on the
+missing markers before processing *any* target — `--check` (run in rossi CI)
+fails, and `tokens.json`, the verbatim copies, and the other editor grammars
+cannot be regenerated. The Zed extension's bundled `highlights.scm` copy
+also needs refreshing at that point: it still references the retired lexical
+node types and will fail query compilation against this grammar.
 
 ## Development
 
