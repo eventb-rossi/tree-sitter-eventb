@@ -5,9 +5,24 @@
 ; @function.builtin, @comment, @string, @number, @label, @variable,
 ; @punctuation.*).
 ;
+; Pattern order matters: the tree-sitter highlight crate (Zed, the CLI) and
+; nvim-treesitter give LATER patterns precedence, so the generic captures come
+; first and the specific ones (@module, @type, @function, @variable.parameter)
+; follow and override them.
+;
 ; ASCII operator spellings are aliased to their canonical Unicode form in the
 ; grammar (e.g. `<=` parses as the anonymous token `≤`), so each operator
-; needs only its Unicode spelling here.
+; needs only its canonical spelling here — which for the Rodin private-use
+; arrows U+E100–E102 is the ASCII spelling, as Unicode has no equivalent.
+
+(comment) @comment
+(string) @string
+(number) @number
+(label) @label
+(identifier) @variable
+
+["(" ")" "[" "]" "{" "}"] @punctuation.bracket
+"," @punctuation.delimiter
 
 [
   "context"
@@ -124,25 +139,29 @@
 ] @constant.builtin
 
 (builtin) @function.builtin
+
 (function_application
+  function: (identifier) @function)
+(function_override
   function: (identifier) @function)
 
 (context name: (identifier) @module)
 (machine name: (identifier) @module)
 (refines_clause target: (identifier) @module)
+(sees_clause (identifier) @module)
+(extends_clause (identifier) @module)
 (component_name (identifier) @module)
 (set_declaration name: (identifier) @type)
 (event name: (identifier) @function)
+(event name: (component_name (identifier) @function))
 (event refines: (identifier) @function)
+(event refines: (component_name (identifier) @function))
 (event extends: (identifier) @function)
+(event extends: (component_name (identifier) @function))
 (any_clause parameter: (identifier) @variable.parameter)
 (typed_identifier name: (identifier) @variable.parameter)
 
-(comment) @comment
-(string) @string
-(number) @number
-(label) @label
-(identifier) @variable
-
-["(" ")" "[" "]" "{" "}"] @punctuation.bracket
-"," @punctuation.delimiter
+; Rodin's mandatory initialisation event renders as a keyword, matching
+; Rodin and Camille (the old lexical grammar also highlighted it that way).
+((event name: (identifier) @keyword)
+  (#eq? @keyword "INITIALISATION"))
