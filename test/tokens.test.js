@@ -8,10 +8,11 @@
 // parse must be error-free; word spellings are re-tested in uppercase
 // (case-insensitivity is part of the contract); for spellings that map to
 // named nodes (constants, builtins) the node type is asserted too. Finally,
-// every anonymous token the templates produce must appear in
-// queries/highlights.scm — this pins the ASCII→canonical alias direction (a
-// dropped alias surfaces the raw ASCII token, which is not in the query) and
-// keeps the hand-maintained highlight lists from drifting behind the grammar.
+// every anonymous token the templates produce must be captured by the
+// compiled queries/highlights.scm query — this pins the ASCII→canonical
+// alias direction (a dropped alias surfaces the raw ASCII token, which no
+// query pattern captures) and keeps the hand-maintained highlight lists from
+// drifting behind the grammar.
 //
 // If rossi adds a spelling or a whole class this file does not know how to
 // place, the test fails — extend the maps below.
@@ -27,15 +28,13 @@ const manifest = JSON.parse(
   readFileSync(fileURLToPath(new URL("./tokens.json", import.meta.url)), "utf8"),
 );
 
-const highlightsSource = readFileSync(
-  fileURLToPath(new URL("../queries/highlights.scm", import.meta.url)),
-  "utf8",
-);
-
-/** Every double-quoted token string mentioned in the highlight queries. */
-const highlightedTokens = new Set(
-  [...highlightsSource.matchAll(/"((?:[^"\\]|\\.)+)"/g)].map((m) =>
-    m[1].replace(/\\(.)/g, "$1"),
+// Compiling the highlight query against the grammar also validates it: an
+// unknown node or token name fails right here, mirroring `tree-sitter test`.
+const highlightQuery = new Parser.Query(
+  EventB,
+  readFileSync(
+    fileURLToPath(new URL("../queries/highlights.scm", import.meta.url)),
+    "utf8",
   ),
 );
 
@@ -44,10 +43,12 @@ parser.setLanguage(EventB);
 
 /** Anonymous token types produced by every template parse in this file. */
 const seenTokens = new Set();
+/** The subset of seenTokens the highlight query failed to capture. */
+const uncoveredTokens = new Set();
 
-function collectAnonymous(node) {
-  if (!node.isNamed) seenTokens.add(node.type);
-  for (let i = 0; i < node.childCount; i++) collectAnonymous(node.child(i));
+function visit(node, fn) {
+  fn(node);
+  for (let i = 0; i < node.childCount; i++) visit(node.child(i), fn);
 }
 
 /** Parse and assert the tree is error-free; returns the root node. */
@@ -58,20 +59,42 @@ function parseOk(source, spelling) {
     false,
     `parsing ${JSON.stringify(spelling)} in ${JSON.stringify(source)} produced: ${root.toString()}`,
   );
-  collectAnonymous(root);
+  const captured = new Set(highlightQuery.captures(root).map((c) => c.node.id));
+  visit(root, (node) => {
+    if (node.isNamed) return;
+    seenTokens.add(node.type);
+    if (!captured.has(node.id)) uncoveredTokens.add(node.type);
+  });
   return root;
 }
 
 /** Collect all node types in the tree (named and anonymous). */
-function nodeTypes(node, out = new Set()) {
-  out.add(node.type);
-  for (let i = 0; i < node.childCount; i++) nodeTypes(node.child(i), out);
+function nodeTypes(root) {
+  const out = new Set();
+  visit(root, (node) => out.add(node.type));
   return out;
 }
 
 /** `source` with whole-word occurrences of `spelling` uppercased. */
 function uppercased(source, spelling) {
   return source.replace(new RegExp(`\\b${spelling}\\b`, "g"), spelling.toUpperCase());
+}
+
+/** The spelling plus its uppercase form when that differs (word spellings). */
+function variants(spelling) {
+  return spelling === spelling.toUpperCase()
+    ? [spelling]
+    : [spelling, spelling.toUpperCase()];
+}
+
+/** Every spelling has a template that parses in manifest case and uppercase. */
+function templatesParse(templates, spellings, what) {
+  for (const spelling of spellings) {
+    const template = templates[spelling];
+    assert.ok(template, `no template for ${what} ${JSON.stringify(spelling)}`);
+    parseOk(template, spelling);
+    parseOk(uppercased(template, spelling), spelling.toUpperCase());
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -106,12 +129,7 @@ const keywordTemplates = {
 };
 
 test("every keyword spelling is accepted structurally (any case)", () => {
-  for (const spelling of manifest.keyword) {
-    const template = keywordTemplates[spelling];
-    assert.ok(template, `no template for keyword ${JSON.stringify(spelling)}`);
-    parseOk(template, spelling);
-    parseOk(uppercased(template, spelling), spelling.toUpperCase());
-  }
+  templatesParse(keywordTemplates, manifest.keyword, "keyword");
 });
 
 // ---------------------------------------------------------------------------
@@ -125,12 +143,7 @@ const statusTemplates = {
 };
 
 test("every status keyword spelling is accepted structurally (any case)", () => {
-  for (const spelling of manifest.status_keyword) {
-    const template = statusTemplates[spelling];
-    assert.ok(template, `no template for status keyword ${JSON.stringify(spelling)}`);
-    parseOk(template, spelling);
-    parseOk(uppercased(template, spelling), spelling.toUpperCase());
-  }
+  templatesParse(statusTemplates, manifest.status_keyword, "status keyword");
 });
 
 // ---------------------------------------------------------------------------
@@ -154,11 +167,7 @@ test("every constant spelling parses as its named node (any case)", () => {
   for (const spelling of [...manifest.constant_word, ...manifest.constant_sym]) {
     const node = constantNodes[spelling];
     assert.ok(node, `no node mapping for constant ${JSON.stringify(spelling)}`);
-    const variants =
-      spelling === spelling.toUpperCase()
-        ? [spelling]
-        : [spelling, spelling.toUpperCase()];
-    for (const variant of variants) {
+    for (const variant of variants(spelling)) {
       const root = parseOk(`context C axioms @a x = ${variant} end`, variant);
       assert.ok(
         nodeTypes(root).has(node),
@@ -170,7 +179,7 @@ test("every constant spelling parses as its named node (any case)", () => {
 
 test("every builtin spelling parses as a builtin node (any case)", () => {
   for (const spelling of manifest.builtin) {
-    for (const variant of [spelling, spelling.toUpperCase()]) {
+    for (const variant of variants(spelling)) {
       const root = parseOk(`context C axioms @a x = ${variant} end`, variant);
       assert.ok(
         nodeTypes(root).has("builtin"),
@@ -281,58 +290,46 @@ test("every operator spelling is accepted in its role (any case)", () => {
     const role = operatorRoles[spelling];
     assert.ok(role, `no role mapping for operator ${JSON.stringify(spelling)}`);
     parseOk(role(spelling), spelling);
-    if (spelling !== spelling.toUpperCase() && /^[a-z]+[0-9]?$/.test(spelling)) {
+    // Word operators are case-insensitive; the manifest says which spellings
+    // those are (symbols like λ have an uppercase form that is not a token).
+    if (manifest.operator_word.includes(spelling)) {
       parseOk(role(spelling.toUpperCase()), spelling.toUpperCase());
     }
   }
 });
 
-test("manifest is non-empty and covers the coloured classes", () => {
-  const nodes = Object.keys(manifest);
-  for (const required of [
-    "keyword",
-    "status_keyword",
-    "constant_sym",
-    "constant_word",
-    "builtin",
-    "operator_sym",
-    "operator_word",
-  ]) {
-    assert.ok(nodes.includes(required), `manifest is missing node class ${required}`);
-    assert.ok(manifest[required].length > 0, `manifest class ${required} is empty`);
+// The class list is an equality, not a subset check: a class the tests above
+// do not know (in either direction) is a contract violation, not a silent
+// pass.
+test("manifest classes match this file's templates and are non-empty", () => {
+  assert.deepEqual(
+    Object.keys(manifest).sort(),
+    [
+      "builtin",
+      "constant_sym",
+      "constant_word",
+      "keyword",
+      "operator_sym",
+      "operator_word",
+      "status_keyword",
+    ],
+    "tokens.json classes changed — extend the templates in this file",
+  );
+  for (const [klass, spellings] of Object.entries(manifest)) {
+    assert.ok(spellings.length > 0, `manifest class ${klass} is empty`);
   }
 });
 
-// The reverse of the previous test: a class added to the manifest that the
-// tests above do not know is a contract violation, not a silent pass.
-test("every manifest class is exercised by this file", () => {
-  const handled = new Set([
-    "keyword",
-    "status_keyword",
-    "constant_sym",
-    "constant_word",
-    "builtin",
-    "operator_sym",
-    "operator_word",
-  ]);
-  for (const key of Object.keys(manifest)) {
-    assert.ok(
-      handled.has(key),
-      `manifest gained class ${JSON.stringify(key)} that this file never parses — add templates for it`,
-    );
-  }
-});
-
-// Every anonymous token surfaced by the templates must be highlighted. This
-// fails when an ASCII spelling stops aliasing to its canonical form (the raw
-// ASCII token is not in highlights.scm) and when a new keyword or operator
-// is added to the grammar without a matching highlight entry.
+// Every anonymous token surfaced by the templates must be captured by the
+// compiled highlight query on the actual tree. This fails when an ASCII
+// spelling stops aliasing to its canonical form (no pattern captures the raw
+// ASCII token) and when a new keyword or operator is added to the grammar
+// without a matching highlight entry.
 test("every canonical token the contract produces is highlighted", () => {
   assert.ok(seenTokens.size > 0, "no tokens collected — did earlier tests run?");
-  for (const tokenType of seenTokens) {
-    assert.ok(
-      highlightedTokens.has(tokenType),
-      `token ${JSON.stringify(tokenType)} is produced by the grammar but absent from queries/highlights.scm`,
-    );
-  }
+  assert.deepEqual(
+    [...uncoveredTokens].sort(),
+    [],
+    "tokens produced by the grammar but not captured by queries/highlights.scm",
+  );
 });

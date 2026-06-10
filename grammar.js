@@ -270,8 +270,9 @@ export default grammar({
     // grammar.pest: refines/extends may follow the name directly, or refines
     // (only) may follow a status clause (event_body); the remaining clauses
     // come in a fixed order, each at most once.
-    event: ($) =>
-      seq(
+    event: ($) => {
+      const refines = seq(kw('refines'), field('refines', $._component_name));
+      return seq(
         optional(field('convergence', $._convergence)),
         kw('event'),
         field('name', $._component_name),
@@ -279,15 +280,12 @@ export default grammar({
           choice(
             seq(
               choice(
-                seq(kw('refines'), field('refines', $._component_name)),
+                refines,
                 seq(kw('extends'), field('extends', $._component_name)),
               ),
               optional($.status_clause),
             ),
-            seq(
-              $.status_clause,
-              optional(seq(kw('refines'), field('refines', $._component_name))),
-            ),
+            seq($.status_clause, optional(refines)),
           ),
         ),
         optional($.any_clause),
@@ -296,7 +294,8 @@ export default grammar({
         optional($.witness_clause),
         optional($.then_clause),
         kw('end'),
-      ),
+      );
+    },
 
     _convergence: ($) =>
       choice(kw('ordinary'), kw('convergent'), kw('anticipated')),
@@ -572,7 +571,7 @@ export default grammar({
         [EXPR.additive, op('−', '-')],
         [EXPR.multiplicative, op('∗', '*')],
         [EXPR.multiplicative, op('÷', '/')],
-        [EXPR.multiplicative, alias(ci('mod'), 'mod')],
+        [EXPR.multiplicative, kw('mod')],
         [EXPR.exponent, '^'],
       ];
       return choice(
@@ -602,8 +601,8 @@ export default grammar({
               op('−', '-'),
               op('ℙ1', ci('pow1')),
               op('ℙ', ci('pow')),
-              alias(ci('dom'), 'dom'),
-              alias(ci('ran'), 'ran'),
+              kw('dom'),
+              kw('ran'),
             )),
             field('operand', $._expression),
           ),
@@ -729,12 +728,7 @@ export default grammar({
 
     // bool(P) converts a predicate to a BOOL value.
     bool_conversion: ($) =>
-      seq(
-        alias(token(ci('bool')), 'bool'),
-        '(',
-        field('predicate', $._predicate),
-        ')',
-      ),
+      seq(kw('bool'), '(', field('predicate', $._predicate), ')'),
 
     // IF P THEN E1 ELSE E2 END (ProB extension).
     if_expression: ($) =>

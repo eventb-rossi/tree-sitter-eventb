@@ -162,6 +162,9 @@
 (typed_identifier name: (identifier) @variable.parameter)
 
 ; Rodin's mandatory initialisation event renders as a keyword, matching
-; Rodin and Camille (the old lexical grammar also highlighted it that way).
+; Rodin and Camille; like every keyword it is case-insensitive (rossi's
+; kw_initialisation is ^"initialisation"). Character classes are the #match?
+; subset shared by the Rust regex engine (CLI, Zed, Helix) and Neovim's
+; vim-regex implementation, unlike (?i) or \c.
 ((event name: (identifier) @keyword)
-  (#eq? @keyword "INITIALISATION"))
+  (#match? @keyword "^[Ii][Nn][Ii][Tt][Ii][Aa][Ll][Ii][Ss][Aa][Tt][Ii][Oo][Nn]$"))
