@@ -3893,8 +3893,11 @@
                 "content": {
                   "type": "ALIAS",
                   "content": {
-                    "type": "PATTERN",
-                    "value": "[mM][oO][dD]"
+                    "type": "TOKEN",
+                    "content": {
+                      "type": "PATTERN",
+                      "value": "[mM][oO][dD]"
+                    }
                   },
                   "named": false,
                   "value": "mod"
@@ -4018,8 +4021,11 @@
                   {
                     "type": "ALIAS",
                     "content": {
-                      "type": "PATTERN",
-                      "value": "[dD][oO][mM]"
+                      "type": "TOKEN",
+                      "content": {
+                        "type": "PATTERN",
+                        "value": "[dD][oO][mM]"
+                      }
                     },
                     "named": false,
                     "value": "dom"
@@ -4027,8 +4033,11 @@
                   {
                     "type": "ALIAS",
                     "content": {
-                      "type": "PATTERN",
-                      "value": "[rR][aA][nN]"
+                      "type": "TOKEN",
+                      "content": {
+                        "type": "PATTERN",
+                        "value": "[rR][aA][nN]"
+                      }
                     },
                     "named": false,
                     "value": "ran"
