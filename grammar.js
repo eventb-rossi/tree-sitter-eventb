@@ -49,6 +49,7 @@ export default grammar({
       $.constant_word,
       $.constant_sym,
       $.builtin,
+      $.quantifier_word,
       $.operator_word,
       $.operator_sym,
       $.label,
@@ -63,9 +64,10 @@ export default grammar({
     status_keyword: $ => token(/(?:anticipated|convergent|ordinary|theorem|skip)/i),
     constant_sym: $ => token(choice("ℕ1", "ℕ", "ℤ", "∅", "{}")),
     constant_word: $ => token(/(?:false|bool|nat1|true|int|nat)/i),
-    builtin: $ => token(/(?:partition|finite|card|pred|prj1|prj2|succ|max|min|id)/i),
+    builtin: $ => token(/(?:partition|finite|card|pred|prj1|prj2|succ|max|min|id)/),
     operator_sym: $ => token(choice("<<->>", "/<<:", ":∈", ":∣", "<->>", "<<->", ">->>", "ℙ1", "+->", "+>>", "-->", "->>", "/<:", "<->", "<<:", "<<|", "<=>", ">+>", ">->", "|->", "|>>", "‥", "ℙ", "→", "↔", "↠", "↣", "↦", "⇒", "⇔", "⇸", "∀", "∃", "∈", "∉", "−", "∖", "∗", "∘", "∣", "∥", "∧", "∨", "∩", "∪", "∼", "≔", "≠", "≤", "≥", "⊂", "⊄", "⊆", "⊈", "⊗", "⋂", "⋃", "▷", "◁", "⤀", "⤔", "⤖", "⦂", "⩤", "⩥", "", "", "", "", "**", "..", "/:", "/=", "/\\", "::", ":=", ":|", "<+", "<:", "<=", "<|", "=>", "><", ">=", "\\/", "|>", "||", "¬", "·", "×", "÷", "λ", "!", "#", "%", "&", "*", "+", "-", ".", "/", ":", ";", "<", "=", ">", "\\", "^", "|", "~")),
-    operator_word: $ => token(/(?:oftype|inter|union|circ|pow1|dom|mod|not|pow|ran|or)/i),
+    quantifier_word: $ => token(/(?:inter|union)/i),
+    operator_word: $ => token(/(?:oftype|POW1|circ|POW|dom|mod|not|ran|or)/),
     // <<< rossi gen-grammars
 
     // Hand-maintained structural tokens.
