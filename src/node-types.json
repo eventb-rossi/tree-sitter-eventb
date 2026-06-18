@@ -45,10 +45,6 @@
           "named": true
         },
         {
-          "type": "quantifier_word",
-          "named": true
-        },
-        {
           "type": "status_keyword",
           "named": true
         },
@@ -118,10 +114,6 @@
   },
   {
     "type": "operator_word",
-    "named": true
-  },
-  {
-    "type": "quantifier_word",
     "named": true
   },
   {

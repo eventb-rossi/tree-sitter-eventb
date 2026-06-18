@@ -35,10 +35,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "quantifier_word"
-        },
-        {
-          "type": "SYMBOL",
           "name": "operator_word"
         },
         {
@@ -115,8 +111,7 @@
       "type": "TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "(?:false|bool|nat1|true|int|nat)",
-        "flags": "i"
+        "value": "(?:FALSE|false|BOOL|NAT1|TRUE|bool|true|INT|NAT)"
       }
     },
     "builtin": {
@@ -574,19 +569,11 @@
         ]
       }
     },
-    "quantifier_word": {
-      "type": "TOKEN",
-      "content": {
-        "type": "PATTERN",
-        "value": "(?:inter|union)",
-        "flags": "i"
-      }
-    },
     "operator_word": {
       "type": "TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "(?:oftype|POW1|circ|POW|dom|mod|not|ran|or)"
+        "value": "(?:oftype|INTER|UNION|POW1|circ|POW|dom|mod|not|ran|or)"
       }
     },
     "identifier": {
