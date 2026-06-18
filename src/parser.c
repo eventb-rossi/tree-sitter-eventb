@@ -265,6 +265,8 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
         't', 42,
         0x2124, 16,
         0x2205, 16,
+        0x22a4, 16,
+        0x22a5, 16,
       );
       if (('\t' <= lookahead && lookahead <= '\r') ||
           lookahead == ' ') SKIP(0);
