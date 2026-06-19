@@ -3,7 +3,7 @@
 //
 // This is a *lexical* grammar: it recognises each coloured token class as its
 // own node so `queries/highlights.scm` can paint it. It deliberately does not
-// parse Event-B structure — the Rossi language server (`rossi-language-server`)
+// parse Event-B structure — the Rossi language server (`eventb-language-server`)
 // provides diagnostics, completion, outline, folding and the rest over LSP
 // (Zed, for one, can overlay the server's semantic tokens via
 // `"semantic_tokens": "combined"`).

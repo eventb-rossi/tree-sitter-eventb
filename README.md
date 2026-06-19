@@ -16,7 +16,7 @@ prepared for [GitHub Linguist](https://github.com/github-linguist/linguist)
 This is a *lexical* grammar: it recognises each coloured token class (keywords,
 operators, constants, built-ins, comments, strings, numbers, labels,
 identifiers) as its own node so `queries/highlights.scm` can paint it. It does
-**not** yet parse Event-B structure — in Rossi, the `rossi-language-server`
+**not** yet parse Event-B structure — in Rossi, the `eventb-language-server`
 provides diagnostics, completion, outline and folding over LSP. The grammar is
 intended to be **hand-extended** with structural rules over time; the generated
 token core stays verified throughout (see below).
