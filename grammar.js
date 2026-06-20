@@ -8,9 +8,9 @@
 // (Zed, for one, can overlay the server's semantic tokens via
 // `"semantic_tokens": "combined"`).
 //
-// The token rules between the `rossi gen-grammars` markers are GENERATED from
+// The token rules between the `cargo xtask gen-grammars` markers are GENERATED from
 // the canonical token tables (crates/rossi/src/{keywords,operators,builtins}.rs).
-// After changing those tables run `cargo run -p rossi-cli -- gen-grammars`, then
+// After changing those tables run `cargo xtask gen-grammars`, then
 // `tree-sitter generate` to refresh src/parser.c. Everything else here is
 // hand-maintained.
 //
@@ -41,7 +41,7 @@ export default grammar({
 
     // A document is a flat stream of coloured tokens. We do not impose Event-B
     // structure here; the language server understands the model. The token
-    // rules referenced here are generated below (`rossi gen-grammars`), split
+    // rules referenced here are generated below (`cargo xtask gen-grammars`), split
     // into word/symbol nodes per coloured class.
     _token: $ => choice(
       $.keyword,
@@ -58,7 +58,7 @@ export default grammar({
       $._punctuation,
     ),
 
-    // >>> rossi gen-grammars (generated, do not edit)
+    // >>> cargo xtask gen-grammars (generated, do not edit)
     keyword: $ => token(/(?:initialisation|invariants|constants|variables|theorems|context|extends|machine|refines|variant|witness|axioms|events|status|begin|event|where|sees|sets|then|when|with|any|end)/i),
     status_keyword: $ => token(/(?:anticipated|convergent|ordinary|theorem|skip)/i),
     constant_sym: $ => token(choice("ℕ1", "ℕ", "ℤ", "∅", "⊤", "⊥", "{}")),
@@ -66,7 +66,7 @@ export default grammar({
     builtin: $ => token(/(?:partition|finite|card|pred|prj1|prj2|succ|max|min|id)/),
     operator_sym: $ => token(choice("<<->>", "/<<:", ":∈", ":∣", "<->>", "<<->", ">->>", "ℙ1", "+->", "+>>", "-->", "->>", "/<:", "<->", "<<:", "<<|", "<=>", ">+>", ">->", "|->", "|>>", "‥", "ℙ", "→", "↔", "↠", "↣", "↦", "⇒", "⇔", "⇸", "∀", "∃", "∈", "∉", "−", "∖", "∗", "∘", "∣", "∥", "∧", "∨", "∩", "∪", "∼", "≔", "≠", "≤", "≥", "⊂", "⊄", "⊆", "⊈", "⊗", "⋂", "⋃", "▷", "◁", "⤀", "⤔", "⤖", "⦂", "⩤", "⩥", "", "", "", "", "**", "..", "/:", "/=", "/\\", "::", ":=", ":|", "<+", "<:", "<=", "<|", "=>", "><", ">=", "\\/", "|>", "||", "¬", "·", "×", "÷", "λ", "!", "#", "%", "&", "*", "+", "-", ".", "/", ":", ";", "<", "=", ">", "\\", "^", "|", "~")),
     operator_word: $ => token(/(?:oftype|INTER|UNION|POW1|circ|POW|dom|mod|not|ran|or)/),
-    // <<< rossi gen-grammars
+    // <<< cargo xtask gen-grammars
 
     // Hand-maintained structural tokens.
     identifier: $ => /[a-zA-Z_][a-zA-Z0-9_']*/,

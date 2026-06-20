@@ -52,7 +52,7 @@ jobs:
         run: npx tree-sitter test
 
       # Behavioral contract: every spelling in the generated test/tokens.json must
-      # tokenize to its node — proves the generated core matches `rossi gen-grammars`
+      # tokenize to its node — proves the generated core matches `cargo xtask gen-grammars`
       # even after the grammar is hand-extended. Also runs the binding smoke test.
       - name: Token contract + binding test
         run: npm test

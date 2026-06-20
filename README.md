@@ -28,19 +28,19 @@ The highlight captures use the standard ecosystem names (`@keyword`,
 ## Generated from Rossi — do not hand-edit the generated parts
 
 The token-level core is generated from Rossi's canonical token tables
-(`crates/rossi/src/{keywords,operators,builtins}.rs`) by `rossi gen-grammars`, so
+(`crates/rossi/src/{keywords,operators,builtins}.rs`) by `cargo xtask gen-grammars`, so
 it can never drift from the parser:
 
 | File | What is generated |
 | --- | --- |
-| `grammar.js` | the token rules, between the `// >>> rossi gen-grammars` markers |
-| `queries/highlights.scm` | the token→capture lines, between the `; >>> rossi gen-grammars` markers |
+| `grammar.js` | the token rules, between the `// >>> cargo xtask gen-grammars` markers |
+| `queries/highlights.scm` | the token→capture lines, between the `; >>> cargo xtask gen-grammars` markers |
 | `test/tokens.json` | the canonical token manifest (`{ node: [spellings] }`) |
 
 Everything **outside** those markers — the grammar scaffold and any future
 hand-written structural rules and captures — is hand-maintained and preserved by
 the generator. To change the token set, edit the tables in Rossi and run
-`cargo run -p rossi-cli -- gen-grammars`; Rossi's CI runs `gen-grammars --check`
+`cargo xtask gen-grammars`; Rossi's CI runs `gen-grammars --check`
 to guarantee this repo's generated regions and `tokens.json` stay byte-identical
 to the tables.
 
