@@ -8,6 +8,7 @@
 /prebuilds/
 *.node
 *.wasm
+*.dylib
 
 # Rust binding build output (this is a library crate; the lockfile is not pinned).
 /target/

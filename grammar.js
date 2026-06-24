@@ -710,7 +710,7 @@ export default grammar({
     _ident_pattern: ($) => choice($.maplet_pattern, $._ident_pattern_atom),
 
     maplet_pattern: ($) =>
-      prec.left(seq($._ident_pattern, op('↦', '|->'), $._ident_pattern)),
+      prec.left(seq($._ident_pattern, op('↦', '|->', ',,'), $._ident_pattern)),
 
     _ident_pattern_atom: ($) =>
       choice(
