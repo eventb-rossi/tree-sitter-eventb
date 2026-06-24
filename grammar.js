@@ -66,6 +66,17 @@ function labeledClause($, keyword, item) {
   return seq(keyword, repeat1(alias($.labeled_predicate, item)));
 }
 
+/**
+ * A comma-separated assignment LHS: identifiers, including the operator-word
+ * fallbacks (a variable may be named `dom`), plus any `extra` heads — the `≔`
+ * form also allows a `function_application` for `f(x) ≔ E`.
+ */
+function assignTargets($, ...extra) {
+  return commaSep1(
+    field('left', choice($.identifier, $._identifier_like, ...extra)),
+  );
+}
+
 /** A bound variable with an optional ⦂ type annotation. */
 function typedBinder($) {
   return seq(
@@ -332,12 +343,7 @@ export default grammar({
     // the operator-word fallbacks: a variable may be named `dom`).
     assignment: ($) =>
       seq(
-        commaSep1(
-          field(
-            'left',
-            choice($.identifier, $._identifier_like, $.function_application),
-          ),
-        ),
+        assignTargets($, $.function_application),
         op('≔', ':='),
         commaSep1(field('right', $._expression)),
       ),
@@ -345,7 +351,7 @@ export default grammar({
     // Non-deterministic: becomes member of a set.
     becomes_member: ($) =>
       seq(
-        commaSep1(field('left', choice($.identifier, $._identifier_like))),
+        assignTargets($),
         op(':∈', '::'),
         field('right', $._expression),
       ),
@@ -353,7 +359,7 @@ export default grammar({
     // Non-deterministic: becomes such that a predicate holds.
     becomes_such: ($) =>
       seq(
-        commaSep1(field('left', choice($.identifier, $._identifier_like))),
+        assignTargets($),
         op(':∣', ':|'),
         field('predicate', $._predicate),
       ),
