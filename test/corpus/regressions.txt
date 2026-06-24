@@ -382,3 +382,57 @@ end
               (binary_expression
                 (identifier)
                 (number)))))))))
+
+================================================================================
+operator input aliases: ,, maplet and +->>/-->> surjections
+================================================================================
+
+context C
+  axioms
+    @a p = a ,, b
+    @b f ∈ A +->> B
+    @c g ∈ A -->> B
+    @d h = λx ,, y · x = x | x
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    (identifier)
+    (axioms_clause
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (binary_expression
+            (identifier)
+            (identifier))))
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (binary_expression
+            (identifier)
+            (identifier))))
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (binary_expression
+            (identifier)
+            (identifier))))
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (lambda_expression
+            (maplet_pattern
+              (typed_identifier
+                (identifier))
+              (typed_identifier
+                (identifier)))
+            (comparison_predicate
+              (identifier)
+              (identifier))
+            (identifier)))))))
