@@ -17,7 +17,7 @@ context: extends, constants
 
 context C1
   extends C0
-  constants a b, c
+  constants a b c
 end
 
 --------------------------------------------------------------------------------

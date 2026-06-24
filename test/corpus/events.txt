@@ -75,9 +75,8 @@ end
             label: (label)
             predicate: (comparison_predicate
               left: (identifier)
-              right: (unary_expression
-                operand: (parenthesized_expression
-                  (identifier)))))
+              right: (closed_unary_expression
+                operand: (identifier))))
           (guard
             label: (label)
             predicate: (comparison_predicate

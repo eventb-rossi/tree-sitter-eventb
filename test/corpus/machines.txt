@@ -18,7 +18,7 @@ machine: refines, sees, variables
 machine M1
   refines M0
   sees C0 C1
-  variables x y, z
+  variables x y z
 end
 
 --------------------------------------------------------------------------------

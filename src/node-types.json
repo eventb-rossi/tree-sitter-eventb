@@ -12,7 +12,15 @@
         "named": true
       },
       {
+        "type": "bool_false",
+        "named": true
+      },
+      {
         "type": "bool_set",
+        "named": true
+      },
+      {
+        "type": "bool_true",
         "named": true
       },
       {
@@ -20,11 +28,11 @@
         "named": true
       },
       {
-        "type": "empty_set",
+        "type": "closed_unary_expression",
         "named": true
       },
       {
-        "type": "false",
+        "type": "empty_set",
         "named": true
       },
       {
@@ -37,10 +45,6 @@
       },
       {
         "type": "identifier",
-        "named": true
-      },
-      {
-        "type": "if_expression",
         "named": true
       },
       {
@@ -89,14 +93,6 @@
       },
       {
         "type": "set_enumeration",
-        "named": true
-      },
-      {
-        "type": "string",
-        "named": true
-      },
-      {
-        "type": "true",
         "named": true
       },
       {
@@ -347,6 +343,10 @@
             "named": false
           },
           {
+            "type": "<+",
+            "named": false
+          },
+          {
             "type": "<->>",
             "named": false
           },
@@ -428,10 +428,6 @@
           },
           {
             "type": "∪",
-            "named": false
-          },
-          {
-            "type": "⊕",
             "named": false
           },
           {
@@ -549,9 +545,34 @@
     }
   },
   {
-    "type": "bool_set",
+    "type": "closed_unary_expression",
     "named": true,
-    "fields": {}
+    "fields": {
+      "operand": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      },
+      "operator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "dom",
+            "named": false
+          },
+          {
+            "type": "ran",
+            "named": false
+          }
+        ]
+      }
+    }
   },
   {
     "type": "comparison_predicate",
@@ -862,7 +883,15 @@
             "named": true
           },
           {
+            "type": "bool_false",
+            "named": true
+          },
+          {
             "type": "bool_set",
+            "named": true
+          },
+          {
+            "type": "bool_true",
             "named": true
           },
           {
@@ -870,11 +899,11 @@
             "named": true
           },
           {
-            "type": "empty_set",
+            "type": "closed_unary_expression",
             "named": true
           },
           {
-            "type": "false",
+            "type": "empty_set",
             "named": true
           },
           {
@@ -887,10 +916,6 @@
           },
           {
             "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
             "named": true
           },
           {
@@ -927,14 +952,6 @@
           },
           {
             "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
             "named": true
           }
         ]
@@ -954,7 +971,15 @@
             "named": true
           },
           {
+            "type": "bool_false",
+            "named": true
+          },
+          {
             "type": "bool_set",
+            "named": true
+          },
+          {
+            "type": "bool_true",
             "named": true
           },
           {
@@ -962,11 +987,11 @@
             "named": true
           },
           {
-            "type": "empty_set",
+            "type": "closed_unary_expression",
             "named": true
           },
           {
-            "type": "false",
+            "type": "empty_set",
             "named": true
           },
           {
@@ -979,10 +1004,6 @@
           },
           {
             "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_expression",
             "named": true
           },
           {
@@ -1019,14 +1040,6 @@
           },
           {
             "type": "set_enumeration",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "true",
             "named": true
           }
         ]
@@ -1063,42 +1076,6 @@
         "types": [
           {
             "type": "_predicate",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "if_expression",
-    "named": true,
-    "fields": {
-      "alternative": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "_expression",
-            "named": true
-          }
-        ]
-      },
-      "condition": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "_predicate",
-            "named": true
-          }
-        ]
-      },
-      "consequence": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "_expression",
             "named": true
           }
         ]
@@ -1763,14 +1740,6 @@
         "required": true,
         "types": [
           {
-            "type": "dom",
-            "named": false
-          },
-          {
-            "type": "ran",
-            "named": false
-          },
-          {
             "type": "ℙ",
             "named": false
           },
@@ -1921,6 +1890,10 @@
     "named": false
   },
   {
+    "type": "<+",
+    "named": false
+  },
+  {
     "type": "<->>",
     "named": false
   },
@@ -1973,6 +1946,18 @@
     "named": false
   },
   {
+    "type": "bool_false",
+    "named": true
+  },
+  {
+    "type": "bool_set",
+    "named": true
+  },
+  {
+    "type": "bool_true",
+    "named": true
+  },
+  {
     "type": "builtin",
     "named": true
   },
@@ -1995,10 +1980,6 @@
   },
   {
     "type": "dom",
-    "named": false
-  },
-  {
-    "type": "else",
     "named": false
   },
   {
@@ -2028,10 +2009,6 @@
   {
     "type": "identifier",
     "named": true
-  },
-  {
-    "type": "if",
-    "named": false
   },
   {
     "type": "integer_set",
@@ -2092,10 +2069,6 @@
   {
     "type": "status",
     "named": false
-  },
-  {
-    "type": "string",
-    "named": true
   },
   {
     "type": "then",
@@ -2299,10 +2272,6 @@
   },
   {
     "type": "⊈",
-    "named": false
-  },
-  {
-    "type": "⊕",
     "named": false
   },
   {

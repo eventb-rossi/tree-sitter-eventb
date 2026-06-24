@@ -320,4 +320,4 @@ end
             type: (bool_set))
           body: (comparison_predicate
             left: (identifier)
-            right: (true)))))))
+            right: (bool_true)))))))
