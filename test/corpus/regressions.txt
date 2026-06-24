@@ -100,10 +100,10 @@ end
               right: (function_application
                 function: (set_enumeration
                   (binary_expression
-                    left: (true)
+                    left: (bool_true)
                     right: (identifier))
                   (binary_expression
-                    left: (false)
+                    left: (bool_false)
                     right: (identifier)))
                 argument: (bool_conversion
                   predicate: (comparison_predicate
@@ -193,7 +193,7 @@ end
           right: (set_enumeration))))))
 
 ================================================================================
-maplet binds tighter than relation arrows and oftype (rossi ladder)
+maplet binds looser than relation arrows and oftype (kernel_lang ladder)
 ================================================================================
 
 context C
@@ -213,19 +213,19 @@ end
         (comparison_predicate
           (identifier)
           (binary_expression
+            (identifier)
             (binary_expression
               (identifier)
-              (identifier))
-            (identifier))))
+              (identifier)))))
       (axiom
         (label)
         (comparison_predicate
           (identifier)
           (binary_expression
+            (identifier)
             (binary_expression
               (identifier)
-              (identifier))
-            (identifier)))))))
+              (identifier))))))))
 
 ================================================================================
 hyphenated event names and refinement targets (Rodin-emitted)
@@ -287,13 +287,12 @@ end
               (number))))))))
 
 ================================================================================
-postfix application heads: literals, bool conversion, IF expression
+postfix application heads: literals, bool conversion
 ================================================================================
 
 context C
   axioms
     @a x = bool(y > 0)(1)
-    @b z = if y > 0 then f else g end(1)
     @c w = 5(1)
 end
 
@@ -312,18 +311,6 @@ end
               (comparison_predicate
                 (identifier)
                 (number)))
-            (number))))
-      (axiom
-        (label)
-        (comparison_predicate
-          (identifier)
-          (function_application
-            (if_expression
-              (comparison_predicate
-                (identifier)
-                (number))
-              (identifier)
-              (identifier))
             (number))))
       (axiom
         (label)
@@ -386,9 +373,8 @@ end
             (label)
             (assignment
               (identifier)
-              (unary_expression
-                (parenthesized_expression
-                  (identifier)))))
+              (closed_unary_expression
+                (identifier))))
           (action
             (label)
             (assignment

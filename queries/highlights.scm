@@ -16,7 +16,6 @@
 ; arrows U+E100–E102 is the ASCII spelling, as Unicode has no equivalent.
 
 (comment) @comment
-(string) @string
 (number) @number
 (label) @label
 (identifier) @variable
@@ -38,9 +37,7 @@
   "invariants"
   "theorem"
   "end"
-  "if"
   "then"
-  "else"
   "variant"
   "events"
   "event"
@@ -98,7 +95,7 @@
   "×"
   ";"
   "∘"
-  "⊕"
+  "<+"
   "◁"
   "⩤"
   "▷"
@@ -131,6 +128,8 @@
 [
   (true)
   (false)
+  (bool_true)
+  (bool_false)
   (integer_set)
   (natural_set)
   (natural1_set)

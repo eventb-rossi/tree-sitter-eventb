@@ -5,9 +5,11 @@
 // tables and byte-checked on the rossi side, so it is the source of truth for
 // "which spelling exists with which role". For the structural grammar, each
 // spelling is embedded in a minimal component exercising that role and the
-// parse must be error-free; word spellings are re-tested in uppercase
-// (case-insensitivity is part of the contract); for spellings that map to
-// named nodes (constants, builtins) the node type is asserted too. Finally,
+// parse must be error-free; structural keyword spellings are re-tested in
+// uppercase (their case-insensitivity is part of the contract), while the
+// math/logic tokens are exact-case and tested only in their manifest spelling;
+// for spellings that map to named nodes (constants, builtins) the node type is
+// asserted too. Finally,
 // every anonymous token the templates produce must be captured by the
 // compiled queries/highlights.scm query — this pins the ASCII→canonical
 // alias direction (a dropped alias surfaces the raw ASCII token, which no
@@ -80,13 +82,6 @@ function uppercased(source, spelling) {
   return source.replace(new RegExp(`\\b${spelling}\\b`, "g"), spelling.toUpperCase());
 }
 
-/** The spelling plus its uppercase form when that differs (word spellings). */
-function variants(spelling) {
-  return spelling === spelling.toUpperCase()
-    ? [spelling]
-    : [spelling, spelling.toUpperCase()];
-}
-
 /** Every spelling has a template that parses in manifest case and uppercase. */
 function templatesParse(templates, spellings, what) {
   for (const spelling of spellings) {
@@ -147,47 +142,56 @@ test("every status keyword spelling is accepted structurally (any case)", () => 
 });
 
 // ---------------------------------------------------------------------------
-// Atomic constants: each spelling must parse as its named node in an
-// expression position.
-const constantNodes = {
-  bool: "bool_set",
-  true: "true",
-  false: "false",
-  int: "integer_set",
-  nat: "natural_set",
-  nat1: "natural1_set",
-  "ℤ": "integer_set",
-  "ℕ": "natural_set",
-  "ℕ1": "natural1_set",
-  "∅": "empty_set",
-  "{}": "empty_set",
+// Atomic constants: each spelling parses as its named node. Unlike the
+// structural keywords these are exact-case (kernel-language reserved words),
+// so they are not re-tested in uppercase. The boolean atoms split by role:
+// the predicate literals true/false/⊤/⊥ sit in predicate position, the values
+// TRUE/FALSE and the BOOL type in expression position, and lowercase `bool` is
+// the bool(P) conversion operator.
+const constantTemplates = {
+  // Expression-position atoms.
+  BOOL: { src: "context C axioms @a x = BOOL end", node: "bool_set" },
+  TRUE: { src: "context C axioms @a x = TRUE end", node: "bool_true" },
+  FALSE: { src: "context C axioms @a x = FALSE end", node: "bool_false" },
+  INT: { src: "context C axioms @a x = INT end", node: "integer_set" },
+  NAT: { src: "context C axioms @a x = NAT end", node: "natural_set" },
+  NAT1: { src: "context C axioms @a x = NAT1 end", node: "natural1_set" },
+  "ℤ": { src: "context C axioms @a x = ℤ end", node: "integer_set" },
+  "ℕ": { src: "context C axioms @a x = ℕ end", node: "natural_set" },
+  "ℕ1": { src: "context C axioms @a x = ℕ1 end", node: "natural1_set" },
+  "∅": { src: "context C axioms @a x = ∅ end", node: "empty_set" },
+  "{}": { src: "context C axioms @a x = {} end", node: "empty_set" },
+  // Predicate-position literals.
+  true: { src: "context C axioms @a true end", node: "true" },
+  false: { src: "context C axioms @a false end", node: "false" },
+  "⊤": { src: "context C axioms @a ⊤ end", node: "true" },
+  "⊥": { src: "context C axioms @a ⊥ end", node: "false" },
+  // The bool(P) conversion operator (lowercase, distinct from the BOOL type).
+  bool: { src: "context C axioms @a x = bool(y = z) end", node: "bool_conversion" },
 };
 
-test("every constant spelling parses as its named node (any case)", () => {
+test("every constant spelling parses as its named node", () => {
   for (const spelling of [...manifest.constant_word, ...manifest.constant_sym]) {
-    const node = constantNodes[spelling];
-    assert.ok(node, `no node mapping for constant ${JSON.stringify(spelling)}`);
-    for (const variant of variants(spelling)) {
-      const root = parseOk(`context C axioms @a x = ${variant} end`, variant);
-      assert.ok(
-        nodeTypes(root).has(node),
-        `expected ${JSON.stringify(variant)} to produce a (${node}) node: ${root.toString()}`,
-      );
-    }
+    const t = constantTemplates[spelling];
+    assert.ok(t, `no template for constant ${JSON.stringify(spelling)}`);
+    const root = parseOk(t.src, spelling);
+    assert.ok(
+      nodeTypes(root).has(t.node),
+      `expected ${JSON.stringify(spelling)} to produce a (${t.node}) node: ${root.toString()}`,
+    );
   }
 });
 
-test("every builtin spelling parses as a builtin node (any case)", () => {
+test("every builtin spelling parses as a builtin node", () => {
   for (const spelling of manifest.builtin) {
-    for (const variant of variants(spelling)) {
-      const root = parseOk(`context C axioms @a x = ${variant} end`, variant);
-      assert.ok(
-        nodeTypes(root).has("builtin"),
-        `expected ${JSON.stringify(variant)} to produce a (builtin) node: ${root.toString()}`,
-      );
-      // Builtins also apply to arguments: card(S), partition(S, A).
-      parseOk(`context C axioms @a x = ${variant}(S, T) end`, variant);
-    }
+    // Builtins are exact-case reserved words (not re-tested in uppercase).
+    const root = parseOk(`context C axioms @a x = ${spelling} end`, spelling);
+    assert.ok(
+      nodeTypes(root).has("builtin"),
+      `expected ${JSON.stringify(spelling)} to produce a (builtin) node: ${root.toString()}`,
+    );
+    // Builtins also apply to arguments: card(S), partition(S, A).
+    parseOk(`context C axioms @a x = ${spelling}(S, T) end`, spelling);
   }
 });
 
@@ -227,7 +231,7 @@ const operatorRoles = {
   "∣": ROLE.pipe, "|": ROLE.pipe,
   "λ": ROLE.lambda, "%": ROLE.lambda,
   "⋃": ROLE.qunion, "⋂": ROLE.qunion,
-  union: ROLE.qunion, inter: ROLE.qunion,
+  UNION: ROLE.qunion, INTER: ROLE.qunion,
   // Comparisons.
   "=": ROLE.relop,
   "≠": ROLE.relop, "/=": ROLE.relop,
@@ -274,9 +278,10 @@ const operatorRoles = {
   "÷": ROLE.binary, "/": ROLE.binary,
   mod: ROLE.binary,
   "^": ROLE.binary,
-  // Prefix and postfix unary.
-  "ℙ": ROLE.prefix, pow: ROLE.prefix,
-  "ℙ1": ROLE.prefix, pow1: ROLE.prefix,
+  // Prefix and postfix unary. POW/POW1 are prefix powersets; dom/ran are the
+  // closed unary applications (mandatory parens), which ROLE.prefix supplies.
+  "ℙ": ROLE.prefix, POW: ROLE.prefix,
+  "ℙ1": ROLE.prefix, POW1: ROLE.prefix,
   dom: ROLE.prefix, ran: ROLE.prefix,
   "∼": ROLE.postfix, "~": ROLE.postfix,
   // Assignments.
@@ -285,16 +290,13 @@ const operatorRoles = {
   ":∣": ROLE.becomesSuch, ":|": ROLE.becomesSuch,
 };
 
-test("every operator spelling is accepted in its role (any case)", () => {
+test("every operator spelling is accepted in its role", () => {
   for (const spelling of [...manifest.operator_sym, ...manifest.operator_word]) {
     const role = operatorRoles[spelling];
     assert.ok(role, `no role mapping for operator ${JSON.stringify(spelling)}`);
+    // Operator words are exact-case (POW, dom, …), so each is tested only in
+    // its manifest spelling — uppercasing `dom` would be an ordinary identifier.
     parseOk(role(spelling), spelling);
-    // Word operators are case-insensitive; the manifest says which spellings
-    // those are (symbols like λ have an uppercase form that is not a token).
-    if (manifest.operator_word.includes(spelling)) {
-      parseOk(role(spelling.toUpperCase()), spelling.toUpperCase());
-    }
   }
 });
 

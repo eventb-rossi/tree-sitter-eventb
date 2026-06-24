@@ -9,17 +9,19 @@
 // monorepo for the consolidated language reference.
 //
 // Design notes:
-// - Keywords are case-insensitive (like rossi and Camille). Each keyword is a
-//   regex token aliased to its canonical lowercase spelling, so queries match
-//   plain strings ("machine", "sees", …). No keyword token carries lexical
-//   precedence: tree-sitter resolves lexing ties by precedence before length,
-//   and a precedence bump would let a keyword eat the prefix of a longer
-//   identifier. Plain longest-match keeps identifiers whole; the `word`
-//   directive below resolves exact-length ties (a whole word equal to a
-//   keyword) in the keyword's favour — which is also what terminates
-//   space-separated identifier lists at the next clause keyword.
-// - Identifier lists accept optional commas, like rossi (spec says
-//   space-separated; Rodin's text tools also emit commas).
+// - Two keyword classes, following rossi's grammar.pest. STRUCTURAL keywords
+//   (context, machine, sees, event, then, end, theorem, skip, …) are
+//   case-insensitive: each is a regex token (via `ci`/`kw`) aliased to its
+//   canonical lowercase spelling, so queries match plain strings. MATH/logic
+//   keywords are exact-case, matching the kernel language — uppercase NAT,
+//   INT, BOOL, TRUE, FALSE, POW, POW1, UNION, INTER and lowercase true, false,
+//   bool, dom, ran, mod, circ, or, not, oftype — so `nat`, `Union`, `DOM` are
+//   ordinary identifiers. No keyword token carries lexical precedence: plain
+//   longest-match keeps identifiers whole, and the `word` directive below
+//   resolves exact-length ties in the keyword's favour, which also terminates
+//   whitespace-separated identifier lists at the next clause keyword.
+// - Structural identifier/reference lists are whitespace-separated; commas are
+//   meaningful only inside formulas (set enumerations, argument lists).
 
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
@@ -48,9 +50,10 @@ function op(canonical, ...variants) {
   return choice(canonical, ...variants.map((v) => alias(v, canonical)));
 }
 
-/** One or more `rule`s separated by optional commas (identifier lists). */
+/** One or more `rule`s separated by whitespace (structural identifier lists;
+ * rossi's grammar.pest no longer accepts commas here). */
 function spaceSep1(rule) {
-  return seq(rule, repeat(seq(optional(','), rule)));
+  return repeat1(rule);
 }
 
 /** One or more `rule`s separated by mandatory commas. */
@@ -67,7 +70,7 @@ function labeledClause($, keyword, item) {
 function typedBinder($) {
   return seq(
     field('name', $.identifier),
-    optional(seq(op('⦂', ci('oftype')), field('type', $._expression))),
+    optional(seq(op('⦂', 'oftype'), field('type', $._expression))),
   );
 }
 
@@ -87,26 +90,24 @@ function quantifiedSetOp($, operator) {
 }
 
 // Predicate precedence, lowest → highest (kernel_lang §3.2.4). Quantifier
-// scope extends as far right as possible; ⇔ binds loosest, ¬ tightest.
-// The spec forbids mixing ∧/∨ and chaining ⇒/⇔ without parentheses; like
-// rossi's parser, we parse such chains permissively (left-associated) and
-// leave rejection to semantic tooling.
+// scope extends as far right as possible; ¬ binds tightest. Following rossi's
+// grammar.pest, ⇒ and ⇔ share one level (implies_equiv) and ∧ and ∨ share one
+// level (connective): they are not precedence ladders but mutually
+// incompatible operators that must be parenthesized when mixed. Like rossi we
+// fold each level flat (left-associated) and leave the mixing/chaining
+// rejection to semantic tooling.
 const PRED = {
   quantified: 1,
-  equivalence: 2,
-  implication: 3,
-  disjunction: 4,
-  conjunction: 5,
-  negation: 6,
+  implies_equiv: 2,
+  connective: 3,
+  negation: 4,
 };
 
-// Expression precedence, lowest → highest (kernel_lang §3.3.4, Table 3.1),
-// except that the relation arrows and ⦂ bind looser than ↦, matching rossi's
-// grammar.pest (relation_type_expr wraps maplet_expr): `a ↦ b ↔ c` is
-// `(a ↦ b) ↔ c`. Note kernel_lang Table 3.1 orders these two levels the
-// other way around — rossi diverges from the spec there, and rossi's own
-// formatter emits maplet–arrow mixes unparenthesized, so only rossi's ladder
-// round-trips rossi-produced text.
+// Expression precedence, lowest → highest (kernel_lang §3.3.4, Table 3.1).
+// The pair constructor `↦` (group 2) is the loosest binary operator, looser
+// than the relation-set arrows and `⦂` (group 3): `a ↦ b ↔ c` is
+// `a ↦ (b ↔ c)`, matching rossi's grammar.pest (maplet_expr wraps
+// relation_type_expr) and the spec.
 // Like rossi, levels the spec declares non-associative (relation arrows,
 // interval, exponent) parse left-associated chains permissively; the set
 // operator compatibility matrix (Table 3.2) is likewise a semantic check,
@@ -114,8 +115,8 @@ const PRED = {
 // grammar.pest (`-a^b` is `(-a)^b`) rather than the spec's arithmetic level.
 const EXPR = {
   quantified: 1,
-  arrow: 2,
-  maplet: 3,
+  maplet: 2,
+  arrow: 3,
   setop: 4,
   interval: 5,
   additive: 6,
@@ -143,24 +144,17 @@ export default grammar({
   supertypes: ($) => [$._expression, $._predicate],
 
   conflicts: ($) => [
-    // Predicates and expressions share atoms (true/false, parentheses): in
-    // `(true)` the parser cannot know locally whether it is closing a
-    // parenthesized predicate or a parenthesized expression that a relational
-    // operator will follow. GLR keeps both readings until one completes.
+    // An application can head a predicate (finite(S)) or an expression (the
+    // left of a comparison); and an expression atom is also a postfix head, so
+    // the predicate, expression, and head readings stay alive together until
+    // the continuation (a comparison operator, a postfix `(`/`{`/`[`, …)
+    // decides.
     [$._predicate, $._expression],
-    // The same atoms are also postfix heads (`TRUE(x)`, `bool(P)(x)`), so the
-    // head reading stays alive alongside both of the above.
     [$._predicate, $._postfix_head],
     [$._expression, $._postfix_head],
     // In `{x, …` an identifier is either a comprehension binder or the first
     // element of a set enumeration (or the expression form's element).
     [$.typed_identifier, $._expression],
-    // `bool` followed by `(` is a predicate-to-BOOL conversion, but `bool`
-    // is also the BOOL type literal.
-    [$.bool_conversion, $.bool_set],
-    // `if` opens an IF/THEN/ELSE expression or names an identifier (rossi
-    // backtracks); the continuation decides.
-    [$._identifier_like, $.if_expression],
     // `theorem` after a label flags the predicate, or starts it as an
     // identifier expression.
     [$._identifier_like, $.labeled_predicate],
@@ -191,7 +185,7 @@ export default grammar({
     _component_name: ($) => choice($.identifier, $.component_name),
 
     component_name: ($) =>
-      seq($.identifier, repeat1(token.immediate(/-[a-zA-Z0-9_']+/))),
+      seq($.identifier, repeat1(token.immediate(/-[a-zA-Z0-9_]+/))),
 
     _context_clause: ($) =>
       choice(
@@ -226,11 +220,15 @@ export default grammar({
     // Machine
     // ==========================
 
+    // EVENTS is the final machine section (grammar.pest machine_body): the
+    // other clauses repeat in any order, then an optional EVENTS block closes
+    // the machine before END.
     machine: ($) =>
       seq(
         kw('machine'),
         field('name', $._component_name),
         repeat($._machine_clause),
+        optional($.events_clause),
         kw('end'),
       ),
 
@@ -242,7 +240,6 @@ export default grammar({
         $.invariants_clause,
         $.theorems_clause,
         $.variant_clause,
-        $.events_clause,
       ),
 
     refines_clause: ($) =>
@@ -409,10 +406,10 @@ export default grammar({
 
     binary_predicate: ($) => {
       const table = [
-        [PRED.equivalence, op('⇔', '<=>')],
-        [PRED.implication, op('⇒', '=>')],
-        [PRED.disjunction, op('∨', ci('or'))],
-        [PRED.conjunction, op('∧', '&')],
+        [PRED.implies_equiv, op('⇔', '<=>')],
+        [PRED.implies_equiv, op('⇒', '=>')],
+        [PRED.connective, op('∨', 'or')],
+        [PRED.connective, op('∧', '&')],
       ];
       return choice(
         ...table.map(([level, operator]) =>
@@ -436,7 +433,7 @@ export default grammar({
         prec.dynamic(
           1,
           seq(
-            field('operator', op('¬', ci('not'))),
+            field('operator', op('¬', 'not')),
             field('operand', $._predicate),
           ),
         ),
@@ -480,11 +477,11 @@ export default grammar({
         $.unary_expression,
         $.inverse_expression,
         $.relational_image,
+        $.closed_unary_expression,
         $.identifier,
         $.number,
-        $.string,
-        $.true,
-        $.false,
+        $.bool_true,
+        $.bool_false,
         $.integer_set,
         $.natural_set,
         $.natural1_set,
@@ -500,30 +497,24 @@ export default grammar({
         $.quantified_union,
         $.quantified_inter,
         $.bool_conversion,
-        $.if_expression,
         $._identifier_like,
       ),
 
-    // Words that are operators only in specific forms fall back to ordinary
-    // identifiers elsewhere, like in rossi, where the PEG backtracks: `union`
-    // and `inter` are operators only when a quantified form follows (the
-    // generalized union of kernel_lang, union(S), is an identifier
-    // application there too; capitalised spellings like `Union` are real
-    // identifiers in published models), and dom/ran/pow/pow1/not/if/theorem
-    // likewise name constants or variables in rossi-valid models. GLR keeps
-    // both readings alive until the continuation decides; dynamic precedence
-    // on the operator rules prefers the operator reading on ties, matching
-    // pest's alternative order.
+    // The exact-case operator words that can also name a constant or variable
+    // fall back to ordinary identifiers, like rossi where the AST builder reads
+    // a bare `dom`/`ran`/`not` as an identifier (then rejects it as reserved —
+    // a semantic check left to tooling). The uppercase operators (POW, UNION,
+    // …) and the now-keyword-free `if`/`union`/`inter`/`pow` need no fallback:
+    // their identifier spellings differ from the exact operator spelling, so
+    // they already lex as plain identifiers. `theorem` stays case-insensitive
+    // (a structural flag). GLR keeps both readings alive until the
+    // continuation decides; dynamic precedence on the operator rules prefers
+    // the operator reading on ties, matching pest's alternative order.
     _identifier_like: ($) =>
       choice(
-        alias(ci('union'), $.identifier),
-        alias(ci('inter'), $.identifier),
-        alias(ci('dom'), $.identifier),
-        alias(ci('ran'), $.identifier),
-        alias(ci('pow'), $.identifier),
-        alias(ci('pow1'), $.identifier),
-        alias(ci('not'), $.identifier),
-        alias(ci('if'), $.identifier),
+        alias('dom', $.identifier),
+        alias('ran', $.identifier),
+        alias('not', $.identifier),
         alias(ci('theorem'), $.identifier),
       ),
 
@@ -535,7 +526,7 @@ export default grammar({
       // so their ASCII spellings are the canonical ones.
       const table = [
         // Set-of-relations constructors (and rossi's ⦂ type ascription),
-        // loosest after quantification — see the EXPR comment above.
+        // tighter than the maplet, looser than the binary set operators.
         [EXPR.arrow, op('↔', '<->')],
         [EXPR.arrow, op('<<->', '')],
         [EXPR.arrow, op('<->>', '')],
@@ -544,20 +535,21 @@ export default grammar({
         [EXPR.arrow, op('→', '-->')],
         [EXPR.arrow, op('⤔', '>+>')],
         [EXPR.arrow, op('↣', '>->')],
-        [EXPR.arrow, op('⤀', '+>>')],
-        [EXPR.arrow, op('↠', '->>')],
+        [EXPR.arrow, op('⤀', '+>>', '+->>')],
+        [EXPR.arrow, op('↠', '->>', '-->>')],
         [EXPR.arrow, op('⤖', '>->>')],
-        [EXPR.arrow, op('⦂', ci('oftype'))],
-        // Pair constructor (maplet), left-associative.
-        [EXPR.maplet, op('↦', '|->')],
+        [EXPR.arrow, op('⦂', 'oftype')],
+        // Pair constructor (maplet), the loosest binary operator,
+        // left-associative; `,,` is an accepted input spelling for ↦.
+        [EXPR.maplet, op('↦', '|->', ',,')],
         // Binary set operators.
         [EXPR.setop, op('∪', '\\/')],
         [EXPR.setop, op('∩', '/\\')],
         [EXPR.setop, op('∖', '\\')],
         [EXPR.setop, op('×', '**')],
         [EXPR.setop, ';'],
-        [EXPR.setop, op('∘', ci('circ'))],
-        [EXPR.setop, op('⊕', '', '<+')],
+        [EXPR.setop, op('∘', 'circ')],
+        [EXPR.setop, op('<+', '')],
         [EXPR.setop, op('◁', '<|')],
         [EXPR.setop, op('⩤', '<<|')],
         [EXPR.setop, op('▷', '|>')],
@@ -571,7 +563,7 @@ export default grammar({
         [EXPR.additive, op('−', '-')],
         [EXPR.multiplicative, op('∗', '*')],
         [EXPR.multiplicative, op('÷', '/')],
-        [EXPR.multiplicative, kw('mod')],
+        [EXPR.multiplicative, 'mod'],
         [EXPR.exponent, '^'],
       ];
       return choice(
@@ -588,9 +580,10 @@ export default grammar({
       );
     },
 
-    // The dynamic precedence prefers the operator reading of dom/ran/pow/pow1
-    // over an identifier application when both complete (`dom(S)`), matching
-    // pest's alternative order.
+    // Prefix unary operators: unary minus and the powersets ℙ/ℙ1 (POW/POW1).
+    // The dynamic precedence prefers the operator reading of pow/pow1 over an
+    // identifier application when both complete, matching pest's alternative
+    // order.
     unary_expression: ($) =>
       prec(
         EXPR.unary,
@@ -599,13 +592,26 @@ export default grammar({
           seq(
             field('operator', choice(
               op('−', '-'),
-              op('ℙ1', ci('pow1')),
-              op('ℙ', ci('pow')),
-              kw('dom'),
-              kw('ran'),
+              op('ℙ1', 'POW1'),
+              op('ℙ', 'POW'),
             )),
             field('operand', $._expression),
           ),
+        ),
+      ),
+
+    // Closed unary application: dom(E) / ran(E), with mandatory parentheses
+    // (Rodin's UnaryExpressionParser; kernel_lang §3.3.6 ⟨unary-op⟩ '(' E ')').
+    // Sits at postfix precedence as a postfix head so it binds like Rodin:
+    // dom(f)(x) = (dom(f))(x), dom(f)∼ = (dom(f))∼.
+    closed_unary_expression: ($) =>
+      prec.left(
+        EXPR.postfix,
+        seq(
+          field('operator', choice('dom', 'ran')),
+          '(',
+          field('operand', $._expression),
+          ')',
         ),
       ),
 
@@ -629,7 +635,7 @@ export default grammar({
       ),
 
     // Rodin's compact spelling of functional override: f{x ↦ y} is sugar for
-    // f ⊕ {x ↦ y}.
+    // f <+ {x ↦ y}.
     function_override: ($) =>
       prec.left(
         EXPR.postfix,
@@ -722,25 +728,14 @@ export default grammar({
     // λx⦂ℤ ↦ y⦂BOOL · … binds two variables, λf⦂ℤ ⇸ ℤ · … binds one.
     pattern_typed_identifier: ($) => prec.left(EXPR.maplet, typedBinder($)),
 
-    quantified_union: ($) => quantifiedSetOp($, op('⋃', ci('union'))),
+    quantified_union: ($) => quantifiedSetOp($, op('⋃', 'UNION')),
 
-    quantified_inter: ($) => quantifiedSetOp($, op('⋂', ci('inter'))),
+    quantified_inter: ($) => quantifiedSetOp($, op('⋂', 'INTER')),
 
-    // bool(P) converts a predicate to a BOOL value.
+    // bool(P) converts a predicate to a BOOL value (lowercase exact `bool`,
+    // distinct from the uppercase BOOL type).
     bool_conversion: ($) =>
-      seq(kw('bool'), '(', field('predicate', $._predicate), ')'),
-
-    // IF P THEN E1 ELSE E2 END (ProB extension).
-    if_expression: ($) =>
-      seq(
-        kw('if'),
-        field('condition', $._predicate),
-        kw('then'),
-        field('consequence', $._expression),
-        kw('else'),
-        field('alternative', $._expression),
-        kw('end'),
-      ),
+      seq('bool', '(', field('predicate', $._predicate), ')'),
 
     _dot: ($) => op('·', '.'),
     _pipe: ($) => op('∣', '|'),
@@ -757,16 +752,15 @@ export default grammar({
         $._identifier_like,
         $.builtin,
         $.number,
-        $.string,
-        $.true,
-        $.false,
+        $.bool_true,
+        $.bool_false,
         $.integer_set,
         $.natural_set,
         $.natural1_set,
         $.bool_set,
         $.empty_set,
         $.bool_conversion,
-        $.if_expression,
+        $.closed_unary_expression,
         $.function_application,
         $.function_override,
         $.parenthesized_expression,
@@ -776,6 +770,15 @@ export default grammar({
         $.set_comprehension,
       ),
 
+    // Function/predicate application. Rossi's grammar.pest splits these:
+    // expression FUNIMAGE is single-argument (`f(x)`; a pair is `f(x ↦ y)`),
+    // while predicate application keeps a comma list (`partition(S, A, B)`).
+    // The same `id(args)` text is both an expression application and a
+    // predicate application, an overlap that resists a clean tree-sitter split,
+    // so this grammar uses one permissive multi-argument node in both
+    // positions. A multi-argument expression application (`f(a, b)`) therefore
+    // parses here though rossi rejects it — a parse-level check left to the
+    // language server, consistent with the grammar's permissiveness elsewhere.
     function_application: ($) =>
       prec.left(
         EXPR.postfix,
@@ -793,26 +796,35 @@ export default grammar({
     // Atomic constants and builtins
     // ==========================
 
-    true: ($) => token(choice(ci('true'), '⊤')),
-    false: ($) => token(choice(ci('false'), '⊥')),
-    integer_set: ($) => token(choice('ℤ', ci('int'))),
-    natural_set: ($) => token(choice('ℕ', ci('nat'))),
-    natural1_set: ($) => token(choice('ℕ1', ci('nat1'))),
-    bool_set: ($) => token(ci('bool')),
-    empty_set: ($) => token(choice('∅', '{}', ',,')),
+    // Predicate literals (lowercase exact + Unicode glyphs). Distinct from the
+    // boolean values TRUE/FALSE (bool_true/bool_false) and the BOOL type
+    // (bool_set): true/⊤ and false/⊥ live only in predicate position.
+    true: ($) => token(choice('true', '⊤')),
+    false: ($) => token(choice('false', '⊥')),
+    // Boolean values (uppercase exact, no Unicode glyph): elements of BOOL.
+    bool_true: ($) => 'TRUE',
+    bool_false: ($) => 'FALSE',
+    // Number-set and BOOL type atoms — uppercase ASCII exact, matching the
+    // kernel language; the Unicode forms are canonical.
+    integer_set: ($) => token(choice('ℤ', 'INT')),
+    natural_set: ($) => token(choice('ℕ', 'NAT')),
+    natural1_set: ($) => token(choice('ℕ1', 'NAT1')),
+    bool_set: ($) => token('BOOL'),
+    empty_set: ($) => token(choice('∅', '{}')),
+    // Support functions/predicates — exact-case (lowercase) reserved words.
     builtin: ($) =>
       token(
         choice(
-          ci('card'),
-          ci('finite'),
-          ci('id'),
-          ci('max'),
-          ci('min'),
-          ci('partition'),
-          ci('pred'),
-          ci('prj1'),
-          ci('prj2'),
-          ci('succ'),
+          'card',
+          'finite',
+          'id',
+          'max',
+          'min',
+          'partition',
+          'pred',
+          'prj1',
+          'prj2',
+          'succ',
         ),
       ),
 
@@ -820,15 +832,17 @@ export default grammar({
     // Lexical tokens
     // ==========================
 
-    identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_']*/,
+    // Mathematical identifier (kernel_lang §2.2): an optional single trailing
+    // prime marks an Event-B after-state variable (`x'`); the prime never
+    // repeats nor appears interior (`x''`, `x'y` are two tokens), matching
+    // Rodin's lexer.
+    identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_]*'?/,
     // Unsigned, unlike rossi's signed integer literal: a leading minus parses
     // as unary minus, so `x-1` cannot lex as `x` `(-1)`.
     number: ($) => /[0-9]+/,
     // Per the TextEditor EBNF: all characters following `@` belong to the
     // label until the next whitespace character.
     label: ($) => /@[^\s]+/,
-    // Only \" and \\ escapes, like rossi's string_inner.
-    string: ($) => token(seq('"', repeat(choice(/[^"\\]/, /\\["\\]/)), '"')),
     comment: ($) =>
       token(
         choice(

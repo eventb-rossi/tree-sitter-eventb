@@ -53,7 +53,7 @@ context C
   axioms
     @a x = − a ∗ b
     @b S ⊆ ℙ(T)
-    @c d = dom f ∪ ran g
+    @c d = dom(f) ∪ ran(g)
 end
 
 --------------------------------------------------------------------------------
@@ -82,9 +82,9 @@ end
         predicate: (comparison_predicate
           left: (identifier)
           right: (binary_expression
-            left: (unary_expression
+            left: (closed_unary_expression
               operand: (identifier))
-            right: (unary_expression
+            right: (closed_unary_expression
               operand: (identifier))))))))
 
 ================================================================================
@@ -182,7 +182,7 @@ intervals, restrictions, overrides, composition
 context C
   axioms
     @a I = 1 ‥ n − 1
-    @b r = S ◁ f ⊕ g ▷ T
+    @b r = S ◁ f <+ g ▷ T
     @c s = f ; g ∘ h
     @d t = A ⩤ r ⩥ B
 end
@@ -239,7 +239,7 @@ postfix: application, image, inverse
 context C
   axioms
     @a y = f(x)
-    @b y = f(a, b)(c)
+    @b y = f(a ↦ b)(c)
     @c T = r[S]
     @d s = f∼(x)
     @e u = r[S]∼
@@ -265,8 +265,9 @@ end
           right: (function_application
             function: (function_application
               function: (identifier)
-              argument: (identifier)
-              argument: (identifier))
+              argument: (binary_expression
+                left: (identifier)
+                right: (identifier)))
             argument: (identifier))))
       (axiom
         label: (label)
@@ -377,12 +378,11 @@ end
             right: (identifier)))))))
 
 ================================================================================
-strings and type ascription
+type ascription
 ================================================================================
 
 context C
   axioms
-    @a name = "hello \"world\""
     @b p = prj1 ⦂ T
 end
 
@@ -392,11 +392,6 @@ end
   (context
     name: (identifier)
     (axioms_clause
-      (axiom
-        label: (label)
-        predicate: (comparison_predicate
-          left: (identifier)
-          right: (string)))
       (axiom
         label: (label)
         predicate: (comparison_predicate

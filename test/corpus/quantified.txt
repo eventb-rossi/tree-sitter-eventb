@@ -314,32 +314,6 @@ end
               right: (identifier))))))))
 
 ================================================================================
-conditional expression (ProB extension)
-================================================================================
-
-context C
-  axioms
-    @a x = IF y > 0 THEN 1 ELSE 2 END
-end
-
---------------------------------------------------------------------------------
-
-(source_file
-  (context
-    name: (identifier)
-    (axioms_clause
-      (axiom
-        label: (label)
-        predicate: (comparison_predicate
-          left: (identifier)
-          right: (if_expression
-            condition: (comparison_predicate
-              left: (identifier)
-              right: (number))
-            consequence: (number)
-            alternative: (number)))))))
-
-================================================================================
 functional override sugar
 ================================================================================
 
