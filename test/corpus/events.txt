@@ -131,7 +131,7 @@ refinement: event refines/extends, witnesses, status
 machine M1
   refines M0
   events
-    convergent event step refines step
+    convergent event step refines step prepare-step
       status convergent
       any y
       where
@@ -142,6 +142,9 @@ machine M1
         @w w ∈ T
       then
         @act1 v ≔ y
+    end
+
+    event merge status convergent refines left right
     end
 
     event copy extends copy
@@ -159,6 +162,8 @@ end
       (event
         name: (identifier)
         refines: (identifier)
+        refines: (component_name
+          (identifier))
         (status_clause)
         (any_clause
           parameter: (identifier))
@@ -188,6 +193,11 @@ end
             (assignment
               left: (identifier)
               right: (identifier)))))
+      (event
+        name: (identifier)
+        (status_clause)
+        refines: (identifier)
+        refines: (identifier))
       (event
         name: (identifier)
         extends: (identifier)))))

@@ -616,11 +616,14 @@
                               "value": "refines"
                             },
                             {
-                              "type": "FIELD",
-                              "name": "refines",
+                              "type": "REPEAT1",
                               "content": {
-                                "type": "SYMBOL",
-                                "name": "_component_name"
+                                "type": "FIELD",
+                                "name": "refines",
+                                "content": {
+                                  "type": "SYMBOL",
+                                  "name": "_component_name"
+                                }
                               }
                             }
                           ]
@@ -692,11 +695,14 @@
                               "value": "refines"
                             },
                             {
-                              "type": "FIELD",
-                              "name": "refines",
+                              "type": "REPEAT1",
                               "content": {
-                                "type": "SYMBOL",
-                                "name": "_component_name"
+                                "type": "FIELD",
+                                "name": "refines",
+                                "content": {
+                                  "type": "SYMBOL",
+                                  "name": "_component_name"
+                                }
                               }
                             }
                           ]

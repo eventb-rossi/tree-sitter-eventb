@@ -274,12 +274,16 @@ export default grammar({
     // The INITIALISATION event needs no special rule: its name parses as a
     // plain identifier (there is no `initialisation` keyword token to shadow
     // it). Event names and refinement targets are Rodin event labels, which
-    // may be hyphenated like component names. The sub-clauses follow
-    // grammar.pest: refines/extends may follow the name directly, or refines
-    // (only) may follow a status clause (event_body); the remaining clauses
-    // come in a fixed order, each at most once.
+    // may be hyphenated like component names. Several refinement targets
+    // represent a merged event. The sub-clauses follow grammar.pest:
+    // refines/extends may follow the name directly, or refines (only) may
+    // follow a status clause (event_body); the remaining clauses come in a
+    // fixed order, each at most once.
     event: ($) => {
-      const refines = seq(kw('refines'), field('refines', $._component_name));
+      const refines = seq(
+        kw('refines'),
+        spaceSep1(field('refines', $._component_name)),
+      );
       return seq(
         optional(field('convergence', $._convergence)),
         kw('event'),
