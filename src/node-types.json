@@ -1773,6 +1773,21 @@
   {
     "type": "variant_clause",
     "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "variant_item",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "variant_item",
+    "named": true,
     "fields": {
       "expression": {
         "multiple": false,
@@ -1780,6 +1795,16 @@
         "types": [
           {
             "type": "_expression",
+            "named": true
+          }
+        ]
+      },
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "label",
             "named": true
           }
         ]

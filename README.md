@@ -55,11 +55,11 @@ compatibility, non-associative chains, ∧/∨ mixing, single-argument
 application): those diagnostics belong to `eventb-language-server`, which also
 provides completion, outline, and folding over LSP.
 
-The grammar is validated against the rossi example models and the
-`eventb-models-collection` corpus (66 importable Rodin archives, parsed in
-both Unicode and ASCII renderings); the only files that do not parse are
-those the reference implementation rejects too (models with a constant named
-`end`, which the textual format cannot represent).
+The grammar is validated against the rossi example models and every component
+from the `eventb-models-collection` corpus that rossi can import, render, and
+strictly reparse. Both Unicode and ASCII renderings must parse without
+`ERROR` or `MISSING` nodes; imports and renderings rejected by the reference
+implementation are reported separately and excluded from the parity set.
 
 ## Relationship to `cargo xtask gen-grammars`
 

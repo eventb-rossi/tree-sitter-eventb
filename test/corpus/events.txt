@@ -292,11 +292,12 @@ end
     (variables_clause
       (identifier))
     (variant_clause
-      expression: (binary_expression
-        left: (binary_expression
-          left: (identifier)
-          right: (number))
-        right: (number)))
+      (variant_item
+        expression: (binary_expression
+          left: (binary_expression
+            left: (identifier)
+            right: (number))
+          right: (number))))
     (events_clause
       (event
         name: (identifier)
@@ -308,6 +309,45 @@ end
               right: (binary_expression
                 left: (identifier)
                 right: (number)))))))))
+
+================================================================================
+labeled and lexicographic variant clauses
+================================================================================
+
+machine Labeled
+  variant
+    @vrn0 n
+    @vrn1 m + 1
+end
+
+machine Mixed
+  variant
+    n
+    @vrn1 m
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (machine
+    name: (identifier)
+    (variant_clause
+      (variant_item
+        label: (label)
+        expression: (identifier))
+      (variant_item
+        label: (label)
+        expression: (binary_expression
+          left: (identifier)
+          right: (number)))))
+  (machine
+    name: (identifier)
+    (variant_clause
+      (variant_item
+        expression: (identifier))
+      (variant_item
+        label: (label)
+        expression: (identifier)))))
 
 ================================================================================
 unlabeled guards and actions

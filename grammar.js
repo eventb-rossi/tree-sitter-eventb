@@ -262,8 +262,26 @@ export default grammar({
 
     invariants_clause: ($) => labeledClause($, kw('invariants'), $.invariant),
 
+    // Several variants form a lexicographic sequence. The first item may be
+    // unlabeled; every following label delimits the next expression.
     variant_clause: ($) =>
-      seq(kw('variant'), field('expression', $._expression)),
+      seq(
+        kw('variant'),
+        $.variant_item,
+        repeat(alias($._labeled_variant_item, $.variant_item)),
+      ),
+
+    variant_item: ($) =>
+      seq(
+        optional(field('label', $.label)),
+        field('expression', $._expression),
+      ),
+
+    _labeled_variant_item: ($) =>
+      seq(
+        field('label', $.label),
+        field('expression', $._expression),
+      ),
 
     // ==========================
     // Events
