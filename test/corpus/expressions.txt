@@ -46,14 +46,16 @@ end
             right: (identifier)))))))
 
 ================================================================================
-unary operators bind tighter than binary
+unary minus takes a multiplicative term, the closed unaries stay tight
 ================================================================================
 
 context C
   axioms
     @a x = − a ∗ b
-    @b S ⊆ ℙ(T)
-    @c d = dom(f) ∪ ran(g)
+    @b y = − a + b
+    @c z = (− a) ∗ b
+    @d S ⊆ ℙ(T)
+    @e d = dom(f) ∪ ran(g)
 end
 
 --------------------------------------------------------------------------------
@@ -66,9 +68,26 @@ end
         label: (label)
         predicate: (comparison_predicate
           left: (identifier)
+          right: (unary_expression
+            operand: (binary_expression
+              left: (identifier)
+              right: (identifier)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
           right: (binary_expression
             left: (unary_expression
               operand: (identifier))
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (parenthesized_expression
+              (unary_expression
+                operand: (identifier)))
             right: (identifier))))
       (axiom
         label: (label)

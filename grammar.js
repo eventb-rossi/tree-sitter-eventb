@@ -122,8 +122,14 @@ const PRED = {
 // Like rossi, levels the spec declares non-associative (relation arrows,
 // interval, exponent) parse left-associated chains permissively; the set
 // operator compatibility matrix (Table 3.2) is likewise a semantic check,
-// not a parse-time one. Unary minus binds tighter than `^`, matching rossi's
-// grammar.pest (`-a^b` is `(-a)^b`) rather than the spec's arithmetic level.
+// not a parse-time one. Unary minus parses at the additive level
+// (kernel_lang §3.3.4 ⟨arithmetic-expr⟩ ::= ['-'] ⟨term⟩ …), matching
+// rossi's grammar.pest: the sign takes a whole multiplicative or
+// exponent term (`-a*b` is `-(a*b)`) while an additive continuation stays
+// outside (`-a+b` keeps `(-a)+b`). One permissive corner: after `^` the
+// sign also swallows a following tight chain (`2^-3*4` groups as
+// `2^(-(3*4))` where pest reads `(2^(-3))*4`) — no corpus source spells
+// a minus after `^`, and this grammar's job is structure, not rejection.
 const EXPR = {
   quantified: 1,
   maplet: 2,
@@ -609,21 +615,32 @@ export default grammar({
     },
 
     // Prefix unary operators: unary minus and the powersets ℙ/ℙ1 (POW/POW1).
-    // The dynamic precedence prefers the operator reading of pow/pow1 over an
-    // identifier application when both complete, matching pest's alternative
-    // order.
+    // Unary minus sits at additive precedence with left resolution, so a
+    // tighter operator shifts into its operand (`-a*b` is `-(a*b)`) while
+    // an equal-precedence `+`/`-` reduces first (`-a+b` is `(-a)+b`); the
+    // powersets keep the tight prefix level. The dynamic precedence prefers
+    // the operator reading of pow/pow1 over an identifier application when
+    // both complete, matching pest's alternative order.
     unary_expression: ($) =>
-      prec(
-        EXPR.unary,
-        prec.dynamic(
-          1,
+      choice(
+        prec.left(
+          EXPR.additive,
           seq(
-            field('operator', choice(
-              op('−', '-'),
-              op('ℙ1', 'POW1'),
-              op('ℙ', 'POW'),
-            )),
+            field('operator', op('−', '-')),
             field('operand', $._expression),
+          ),
+        ),
+        prec(
+          EXPR.unary,
+          prec.dynamic(
+            1,
+            seq(
+              field('operator', choice(
+                op('ℙ1', 'POW1'),
+                op('ℙ', 'POW'),
+              )),
+              field('operand', $._expression),
+            ),
           ),
         ),
       ),
