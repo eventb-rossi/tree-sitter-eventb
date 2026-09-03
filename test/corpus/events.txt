@@ -350,18 +350,18 @@ end
         expression: (identifier)))))
 
 ================================================================================
-unlabeled guards and actions
+several guards and actions in one clause
 ================================================================================
 
 machine M
   events
     event e
       where
-        x > 0
-        y < 5
+        @g1 x > 0
+        @g2 y < 5
       then
-        x ≔ 0
-        y ≔ 1
+        @a1 x ≔ 0
+        @a2 y ≔ 1
     end
 end
 
@@ -375,19 +375,23 @@ end
         name: (identifier)
         (where_clause
           (guard
+            label: (label)
             predicate: (comparison_predicate
               left: (identifier)
               right: (number)))
           (guard
+            label: (label)
             predicate: (comparison_predicate
               left: (identifier)
               right: (number))))
         (then_clause
           (action
+            label: (label)
             (assignment
               left: (identifier)
               right: (number)))
           (action
+            label: (label)
             (assignment
               left: (identifier)
               right: (number))))))))

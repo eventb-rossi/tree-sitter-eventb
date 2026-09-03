@@ -182,13 +182,12 @@ export default grammar({
 
   conflicts: ($) => [
     // An application can head a predicate (finite(S)) or an expression (the
-    // left of a comparison); and an expression atom is also a postfix head, so
-    // the predicate, expression, and head readings stay alive together until
-    // the continuation (a comparison operator, a postfix `(`/`{`/`[`, …)
-    // decides.
+    // left of a comparison), so both readings stay alive until the
+    // continuation (a comparison operator, a postfix `(`/`{`/`[`, …) decides.
+    // The postfix-head readings need no declaration of their own: an item
+    // opens with its label, so a formula is never the first token of a clause
+    // member, and the automaton separates the heads on its own.
     [$._predicate, $._expression],
-    [$._predicate, $._postfix_head],
-    [$._expression, $._postfix_head],
     // In `{x, …` an identifier is either a comprehension binder or the first
     // element of a set enumeration (or the expression form's element).
     [$.typed_identifier, $._expression],
@@ -378,9 +377,10 @@ export default grammar({
     // Actions
     // ==========================
 
+    // The label is mandatory, as it is on a predicate.
     action: ($) =>
       seq(
-        optional(field('label', $.label)),
+        field('label', $.label),
         choice($.skip, $.assignment, $.becomes_member, $.becomes_such),
       ),
 
@@ -416,15 +416,15 @@ export default grammar({
     // Labeled predicates
     // ==========================
 
-    // Accepts "@label P", "theorem @label P", "@label theorem P", and bare
-    // "P" (rossi-compatible; Rodin's text tools always emit labels).
+    // Accepts "@label P", "theorem @label P" and "@label theorem P". The label
+    // is mandatory: Camille's grammar and XEventB's both require one, and
+    // Rodin's static checker reports a missing one as "Label missing", so a
+    // bare "P" is not Event-B in any of the three.
     labeled_predicate: ($) =>
       seq(
-        optional(
-          choice(
-            seq(kw('theorem'), field('label', $.label)),
-            seq(field('label', $.label), optional(kw('theorem'))),
-          ),
+        choice(
+          seq(kw('theorem'), field('label', $.label)),
+          seq(field('label', $.label), optional(kw('theorem'))),
         ),
         field('predicate', $._predicate),
       ),

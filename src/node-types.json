@@ -145,7 +145,7 @@
     "fields": {
       "label": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "label",
@@ -229,7 +229,7 @@
     "fields": {
       "label": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "label",
@@ -1062,7 +1062,7 @@
     "fields": {
       "label": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "label",
@@ -1088,7 +1088,7 @@
     "fields": {
       "label": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "label",
@@ -1660,7 +1660,7 @@
     "fields": {
       "label": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "label",
@@ -1847,7 +1847,7 @@
     "fields": {
       "label": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "label",
