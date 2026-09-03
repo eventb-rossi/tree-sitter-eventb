@@ -143,12 +143,32 @@ const EXPR = {
   postfix: 10,
 };
 
+// Event-B's whitespace, as Rodin's math lexer defines it (see `extras` below):
+// every Unicode Zs/Zl/Zp separator, plus U+0009..U+000D and U+001C..U+001F.
+const WHITESPACE =
+  /[\t-\r\x1C-\x1F \u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]/;
+
+// `@` followed by everything up to the next separator — the complement of
+// WHITESPACE, so the label boundary and the token boundary stay in lockstep.
+const NOT_WHITESPACE_PLUS_AT =
+  /@[^\t-\r\x1C-\x1F \u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+/;
+
 export default grammar({
   name: 'eventb',
 
   // Whitespace separates tokens; comments are nodes (so they highlight) but
   // are skippable anywhere.
-  extras: ($) => [/\s/, $.comment],
+  //
+  // The class is spelled out rather than written `/\s/`, which tree-sitter
+  // compiles to ASCII only (`('\t' <= c && c <= '\r') || c == ' '`). Event-B's
+  // separator set is Rodin's: `LexicalClass.isWhitespace(cp)` in
+  // `org.eventb.core.ast` is `Character.isWhitespace(cp) ||
+  // FormulaFactory.isEventBWhiteSpace(cp)`, and because the latter ORs in
+  // `Character.isSpaceChar` the usual NBSP / U+2007 / U+202F carve-out is
+  // cancelled — leaving every Unicode Zs/Zl/Zp separator plus U+0009..U+000D
+  // and U+001C..U+001F. U+0085 (Cc) and U+200B (Cf) are deliberately absent:
+  // Rodin does not separate on them, and neither does rossi's `grammar.pest`.
+  extras: ($) => [WHITESPACE, $.comment],
 
   // Keyword extraction: a whole-word token that exactly matches a keyword
   // resolves to the keyword where the keyword is valid, and to `identifier`
@@ -886,8 +906,11 @@ export default grammar({
     // as unary minus, so `x-1` cannot lex as `x` `(-1)`.
     number: ($) => /[0-9]+/,
     // Per the TextEditor EBNF: all characters following `@` belong to the
-    // label until the next whitespace character.
-    label: ($) => /@[^\s]+/,
+    // label until the next whitespace character. The negated class must be the
+    // same set `extras` skips, or a label ends where the parser does not —
+    // rossi wires `label_text` to its `WHITESPACE` rule for exactly this
+    // reason.
+    label: ($) => NOT_WHITESPACE_PLUS_AT,
     comment: ($) =>
       token(
         choice(
