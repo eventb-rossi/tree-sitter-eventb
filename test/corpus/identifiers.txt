@@ -1,0 +1,106 @@
+; Identifiers use Rodin's alphabet: Java's identifier classes over Unicode,
+; minus the lambda letter and the dollar sign (grammar.js `IDENT_START`).
+; The letter glyphs ℕ, ℤ and ℙ are identifier characters too, so `ℤx` is one
+; identifier while the bare glyph stays the keyword, as in Rodin's lexer.
+
+================================================================================
+identifiers: Unicode letters and a glyph-prefixed name
+================================================================================
+
+context C
+  constants α ℝ ℤx ℕ1x naïve
+  axioms
+    @a α ∈ ℤ
+    @b ℤx ⊆ ℙ(ℝ)
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (constants_clause
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier))
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (integer_set)))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (unary_expression
+            operand: (parenthesized_expression
+              (identifier))))))))
+
+================================================================================
+identifiers: the lambda letter is never an identifier character
+================================================================================
+
+context C
+  axioms
+    @c f = λx · x ∈ ℕ ∣ x
+    @d g = λα ↦ β · α ∈ ℕ ∧ β ∈ ℕ ∣ α + β
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (lambda_expression
+            pattern: (typed_identifier
+              name: (identifier))
+            condition: (comparison_predicate
+              left: (identifier)
+              right: (natural_set))
+            body: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (lambda_expression
+            pattern: (maplet_pattern
+              (typed_identifier
+                name: (identifier))
+              (typed_identifier
+                name: (identifier)))
+            condition: (binary_predicate
+              left: (comparison_predicate
+                left: (identifier)
+                right: (natural_set))
+              right: (comparison_predicate
+                left: (identifier)
+                right: (natural_set)))
+            body: (binary_expression
+              left: (identifier)
+              right: (identifier))))))))
+
+================================================================================
+identifiers: component names with Unicode segments
+================================================================================
+
+context ctx-α
+  extends ENV_C-1
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (component_name
+      (identifier))
+    (extends_clause
+      (component_name
+        (identifier)))))

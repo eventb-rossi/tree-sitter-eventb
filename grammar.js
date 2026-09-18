@@ -20,6 +20,11 @@
 //   longest-match keeps identifiers whole, and the `word` directive below
 //   resolves exact-length ties in the keyword's favour, which also terminates
 //   whitespace-separated identifier lists at the next clause keyword.
+// - Identifiers use Rodin's alphabet (Java's identifier classes over Unicode,
+//   see `IDENT_START`), so the letter glyphs ℕ, ℤ and ℙ are identifier
+//   characters too: the bare glyph is the keyword, `ℤx` is one identifier,
+//   exactly as Rodin's lexer reads the longest identifier and then looks the
+//   whole image up in its token table.
 // - Structural identifier/reference lists are whitespace-separated; commas are
 //   meaningful only inside formulas (set enumerations, argument lists).
 
@@ -176,6 +181,27 @@ const EXPR = {
   postfix: 10,
 };
 
+// Rodin's identifier alphabet (rossi's grammar.pest `ident_start` and
+// `word_char`, names.rs `is_math_identifier_start/part`): Java's
+// isJavaIdentifierStart/Part classes minus `λ` (the lambda token) and `$`
+// (Rodin's meta-variable sigil). Letters, letter numbers, currency symbols
+// and connector punctuation start a name; decimal digits and combining marks
+// continue one. The general categories are disjoint, so rossi's fast-path
+// guard against math symbols has no counterpart here. Rust regex syntax
+// (`\p{..}` classes, class intersection `&&`), hence `RustRegex` rather than
+// a JS literal, which the generator would read with JS escapes.
+const IDENT_START = '[[\\p{L}\\p{Nl}\\p{Sc}\\p{Pc}]&&[^λ$]]';
+const WORD_CHAR =
+  '[[\\p{L}\\p{Nl}\\p{Sc}\\p{Pc}\\p{Nd}\\p{Mn}\\p{Mc}]&&[^λ$]]';
+// Mathematical identifier (kernel_lang §2.2): an optional single trailing
+// prime marks an Event-B after-state variable (`x'`); the prime never
+// repeats nor appears interior (`x''`, `x'y` are two tokens), matching
+// Rodin's lexer.
+const IDENTIFIER = new RustRegex(`${IDENT_START}${WORD_CHAR}*'?`);
+// The hyphen-joined tail segments of a component name (grammar.pest
+// `component_name`: `ident_core ("-" word_char+)*`).
+const COMPONENT_NAME_TAIL = new RustRegex(`-${WORD_CHAR}+`);
+
 // Event-B's whitespace, as Rodin's math lexer defines it (see `extras` below):
 // every Unicode Zs/Zl/Zp separator, plus U+0009..U+000D and U+001C..U+001F.
 const WHITESPACE =
@@ -224,7 +250,10 @@ export default grammar({
   // dialect's own extension and Rodin reads them as identifiers.
   // A reserved word must name a token, so the words that share one token
   // (`builtin` is id/pred/prj1/prj2/succ, `_closed_predicate` is
-  // finite/partition) are listed by their rule.
+  // finite/partition) are listed by their rule. The letter glyphs of the
+  // number sets and the powerset are identifier characters (`IDENT_START`),
+  // so the bare glyph would otherwise fall back to an identifier where its
+  // token is not valid (`variables ℤ`); Rodin refuses those names too.
   reserved: {
     global: ($) => [
       'bool',
@@ -234,6 +263,11 @@ export default grammar({
       'min',
       'mod',
       'ran',
+      'ℤ',
+      'ℕ',
+      'ℕ1',
+      'ℙ',
+      'ℙ1',
       $.builtin,
       $._closed_predicate,
       $.bool_set,
@@ -292,7 +326,7 @@ export default grammar({
       reserved('structural_name', choice($.identifier, $.component_name)),
 
     component_name: ($) =>
-      seq($.identifier, repeat1(token.immediate(/-[a-zA-Z0-9_]+/))),
+      seq($.identifier, repeat1(token.immediate(COMPONENT_NAME_TAIL))),
 
     _context_clause: ($) =>
       choice(
@@ -1052,10 +1086,12 @@ export default grammar({
     bool_true: ($) => 'TRUE',
     bool_false: ($) => 'FALSE',
     // Number-set and BOOL type atoms — uppercase ASCII exact, matching the
-    // kernel language; the Unicode forms are canonical.
-    integer_set: ($) => token(choice('ℤ', 'INT')),
-    natural_set: ($) => token(choice('ℕ', 'NAT')),
-    natural1_set: ($) => token(choice('ℕ1', 'NAT1')),
+    // kernel language; the Unicode forms are canonical. Each glyph and its
+    // ASCII spelling is its own token: the glyph is a reserved word (below)
+    // while the ASCII word may still name an identifier, as in rossi.
+    integer_set: (_) => choice('ℤ', alias('INT', 'ℤ')),
+    natural_set: (_) => choice('ℕ', alias('NAT', 'ℕ')),
+    natural1_set: (_) => choice('ℕ1', alias('NAT1', 'ℕ1')),
     bool_set: ($) => token('BOOL'),
     empty_set: ($) => token(choice('∅', '{}')),
     // The generic atoms of kernel_lang §2.2: Rodin's `ATOMIC_EXPR` group,
@@ -1074,11 +1110,8 @@ export default grammar({
     // Lexical tokens
     // ==========================
 
-    // Mathematical identifier (kernel_lang §2.2): an optional single trailing
-    // prime marks an Event-B after-state variable (`x'`); the prime never
-    // repeats nor appears interior (`x''`, `x'y` are two tokens), matching
-    // Rodin's lexer.
-    identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_]*'?/,
+    // See `IDENTIFIER`: Rodin's alphabet, one optional trailing prime.
+    identifier: (_) => IDENTIFIER,
     // Unsigned, unlike rossi's signed integer literal: a leading minus parses
     // as unary minus, so `x-1` cannot lex as `x` `(-1)`.
     number: ($) => /[0-9]+/,

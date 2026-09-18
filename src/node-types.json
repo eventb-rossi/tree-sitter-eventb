@@ -1187,6 +1187,11 @@
     }
   },
   {
+    "type": "integer_set",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "invariant",
     "named": true,
     "fields": {
@@ -1435,6 +1440,16 @@
         }
       ]
     }
+  },
+  {
+    "type": "natural1_set",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "natural_set",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "not_predicate",
@@ -2400,10 +2415,6 @@
     "named": true
   },
   {
-    "type": "integer_set",
-    "named": true
-  },
-  {
     "type": "invariants",
     "named": false
   },
@@ -2426,14 +2437,6 @@
   {
     "type": "mod",
     "named": false
-  },
-  {
-    "type": "natural1_set",
-    "named": true
-  },
-  {
-    "type": "natural_set",
-    "named": true
   },
   {
     "type": "number",
@@ -2540,11 +2543,23 @@
     "named": false
   },
   {
+    "type": "ℕ",
+    "named": false
+  },
+  {
+    "type": "ℕ1",
+    "named": false
+  },
+  {
     "type": "ℙ",
     "named": false
   },
   {
     "type": "ℙ1",
+    "named": false
+  },
+  {
+    "type": "ℤ",
     "named": false
   },
   {

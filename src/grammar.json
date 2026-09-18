@@ -93,7 +93,7 @@
             "type": "IMMEDIATE_TOKEN",
             "content": {
               "type": "PATTERN",
-              "value": "-[a-zA-Z0-9_]+"
+              "value": "-[[\\p{L}\\p{Nl}\\p{Sc}\\p{Pc}\\p{Nd}\\p{Mn}\\p{Mc}]&&[^λ$]]+"
             }
           }
         }
@@ -5120,52 +5120,58 @@
       "value": "FALSE"
     },
     "integer_set": {
-      "type": "TOKEN",
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "STRING",
-            "value": "ℤ"
-          },
-          {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "ℤ"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
             "type": "STRING",
             "value": "INT"
-          }
-        ]
-      }
+          },
+          "named": false,
+          "value": "ℤ"
+        }
+      ]
     },
     "natural_set": {
-      "type": "TOKEN",
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "STRING",
-            "value": "ℕ"
-          },
-          {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "ℕ"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
             "type": "STRING",
             "value": "NAT"
-          }
-        ]
-      }
+          },
+          "named": false,
+          "value": "ℕ"
+        }
+      ]
     },
     "natural1_set": {
-      "type": "TOKEN",
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "STRING",
-            "value": "ℕ1"
-          },
-          {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "ℕ1"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
             "type": "STRING",
             "value": "NAT1"
-          }
-        ]
-      }
+          },
+          "named": false,
+          "value": "ℕ1"
+        }
+      ]
     },
     "bool_set": {
       "type": "TOKEN",
@@ -5236,7 +5242,7 @@
     },
     "identifier": {
       "type": "PATTERN",
-      "value": "[a-zA-Z_][a-zA-Z0-9_]*'?"
+      "value": "[[\\p{L}\\p{Nl}\\p{Sc}\\p{Pc}]&&[^λ$]][[\\p{L}\\p{Nl}\\p{Sc}\\p{Pc}\\p{Nd}\\p{Mn}\\p{Mc}]&&[^λ$]]*'?"
     },
     "number": {
       "type": "PATTERN",
@@ -5346,6 +5352,26 @@
       {
         "type": "STRING",
         "value": "ran"
+      },
+      {
+        "type": "STRING",
+        "value": "ℤ"
+      },
+      {
+        "type": "STRING",
+        "value": "ℕ"
+      },
+      {
+        "type": "STRING",
+        "value": "ℕ1"
+      },
+      {
+        "type": "STRING",
+        "value": "ℙ"
+      },
+      {
+        "type": "STRING",
+        "value": "ℙ1"
       },
       {
         "type": "SYMBOL",

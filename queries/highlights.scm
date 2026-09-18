@@ -144,6 +144,10 @@
   (empty_set)
 ] @constant.builtin
 
+; The number-set glyphs are tokens of their own (their ASCII spellings alias
+; to them), so they are captured as tokens as well as through their nodes.
+["ℤ" "ℕ" "ℕ1"] @constant.builtin
+
 (builtin) @function.builtin
 
 (function_application
