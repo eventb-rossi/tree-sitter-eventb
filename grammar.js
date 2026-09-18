@@ -1028,34 +1028,37 @@ export default grammar({
         $.set_comprehension,
       ),
 
-    // Expression application, single-argument like Rodin's FUNIMAGE: `f(x)`,
-    // with a pair written as a maplet `f(x ↦ y)`, never a comma list. Rodin's
-    // parser for it reads one expression and then demands `)`
-    // (`SubParsers.BinaryLedExprParser` over the singular `EXPR_PARSER`), and
-    // rossi's grammar.pest `function_application` does the same.
+    // Expression application: `f(x)`, and a comma list `f(x, y)`. Rodin's
+    // core FUNIMAGE is single-argument (its parser reads one expression and
+    // then demands `)`, `SubParsers.BinaryLedExprParser` over the singular
+    // `EXPR_PARSER`; a pair is written as a maplet `f(x ↦ y)`), and only a
+    // prefix extension operator of a formula factory takes a list. Which
+    // heads are operators is not this grammar's business, so it admits the
+    // list for every head, as rossi's grammar.pest `function_application`
+    // does, and rossi's AST builder refuses it on a core head.
     function_application: ($) =>
       prec.left(
         EXPR.postfix,
         seq(
           field('function', $._postfix_head),
           '(',
-          field('argument', $._expression),
+          commaSep1(field('argument', $._expression)),
           ')',
         ),
       ),
 
-    // Predicate application, where the comma list lives: `partition(S, A, B)`
-    // is Rodin's only multi-argument construct (`MultiplePredicate`, the sole
-    // user of `EXPR_LIST_PARSER`) and it is a predicate, not an expression.
-    // Like rossi's grammar.pest `predicate_application` the head is any
+    // Predicate application: `partition(S, A, B)` is Rodin's multi-argument
+    // predicate (`MultiplePredicate`, the sole user of `EXPR_LIST_PARSER`),
+    // and a predicate operator of a formula factory takes a list the same
+    // way. Like rossi's grammar.pest `predicate_application` the head is any
     // identifier-shaped word, and which heads actually resolve is left to
     // tooling (rossi answers with `BuiltinPredicate::from_name`).
     //
-    // The same `f(x)` text is a predicate application here and an expression
-    // application in the left of a comparison. That is a positional
-    // difference, not one that needs types, so the `[$._postfix_head,
-    // $.predicate_application]` conflict above keeps both readings alive
-    // until the continuation decides, and `x = c(1, 2)` has no reading.
+    // The same `f(x, y)` text is a predicate application here and an
+    // expression application in the left of a comparison. That is a
+    // positional difference, not one that needs types, so the
+    // `[$._postfix_head, $.predicate_application]` conflict above keeps both
+    // readings alive until the continuation decides.
     predicate_application: ($) =>
       seq(
         field(

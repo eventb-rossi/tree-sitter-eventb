@@ -223,7 +223,7 @@ test("a closed builtin is meaningless bare or misapplied", () => {
     parseFails(`context C axioms @a x = ${spelling} end`, "bare closed builtin");
     parseFails(`machine M variables ${spelling} end`, "closed builtin as a name");
   }
-  // The comma list belongs to predicate application alone.
+  // A closed unary word is not an application head, so no comma list.
   parseFails("context C axioms @a x = card(S, T) end", "closed unary takes one argument");
   parseFails("context C axioms @a x = card[S] end", "a closed word is not a relation");
 });
