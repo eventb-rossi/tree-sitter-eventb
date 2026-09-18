@@ -51,8 +51,12 @@ override `<+` (U+E103). Math and logic keywords are exact-case (uppercase
 `NAT`/`POW`/`UNION`/`BOOL`/`TRUE`, lowercase `dom`/`ran`/`mod`/`bool`); the
 structural keywords are case-insensitive.
 
-Parsing is permissive where the spec demands semantic checks (operator
-compatibility, non-associative chains, ∧/∨ mixing, application arity): those
+The levels the spec declares non-associative (the relation arrows and `⦂`,
+the interval, the exponent) take one operator and no chain, following
+grammar.pest: `A ↔ B ↔ C`, `1 ‥ 2 ‥ 3` and `2 ^ 3 ^ 4` are refused here as
+they are by Rodin. Parsing stays permissive where the check does not reduce
+to a grammar: the set operator compatibility matrix (Table 3.2, asymmetric
+and not a precedence ladder), ∧/∨ mixing, and application arity. Those
 diagnostics belong to `eventb-language-server`, which also provides
 completion, outline, and folding over LSP.
 

@@ -418,3 +418,85 @@ end
           right: (binary_expression
             left: (builtin)
             right: (identifier)))))))
+
+================================================================================
+incompatible set operators still parse: Table 3.2 is a semantic check
+================================================================================
+
+context C
+  axioms
+    @a c = {1} ∪ {2} ∩ {3}
+    @b d = A ▷ B ∩ C
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    (identifier)
+    (axioms_clause
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (binary_expression
+            (binary_expression
+              (set_enumeration
+                (number))
+              (set_enumeration
+                (number)))
+            (set_enumeration
+              (number)))))
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (identifier))
+            (identifier)))))))
+
+================================================================================
+a minus after the exponent binds tightly
+================================================================================
+
+context C
+  axioms
+    @a c = 2 ^ −3 ∗ 4
+    @b d = −a ∗ b
+    @c e = −a + b
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    (identifier)
+    (axioms_clause
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (binary_expression
+            (binary_expression
+              (number)
+              (unary_expression
+                (number)))
+            (number))))
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (unary_expression
+            (binary_expression
+              (identifier)
+              (identifier)))))
+      (axiom
+        (label)
+        (comparison_predicate
+          (identifier)
+          (binary_expression
+            (unary_expression
+              (identifier))
+            (identifier)))))))

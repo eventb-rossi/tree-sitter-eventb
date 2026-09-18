@@ -67,6 +67,32 @@ function labeledClause($, keyword, item) {
 }
 
 /**
+ * One precedence level of the binary operator table, as a `binary_expression`
+ * node. `left` and `right` are the levels the operands may reach: the level
+ * itself on the left and the next tighter one on the right for a level that
+ * folds left, and the next tighter one on both sides for a level the spec
+ * declares non-associative, which is what refuses a chain of it.
+ *
+ * The precedences are not what orders the levels any more, the operand rules
+ * are; they stay because the quantified forms, unary minus and the postfix
+ * operators still resolve against a binary operator by precedence.
+ */
+function binaryLevel(level, left, right, operators) {
+  return choice(
+    ...operators.map((operator) =>
+      prec.left(
+        level,
+        seq(
+          field('left', left),
+          field('operator', operator),
+          field('right', right),
+        ),
+      ),
+    ),
+  );
+}
+
+/**
  * A comma-separated assignment LHS: identifiers, including the operator-word
  * fallbacks (a variable may be named `dom`), plus any `extra` heads — the `≔`
  * form also allows a `function_application` for `f(x) ≔ E`.
@@ -119,17 +145,24 @@ const PRED = {
 // than the relation-set arrows and `⦂` (group 3): `a ↦ b ↔ c` is
 // `a ↦ (b ↔ c)`, matching rossi's grammar.pest (maplet_expr wraps
 // relation_type_expr) and the spec.
-// Like rossi, levels the spec declares non-associative (relation arrows,
-// interval, exponent) parse left-associated chains permissively; the set
-// operator compatibility matrix (Table 3.2) is likewise a semantic check,
-// not a parse-time one. Unary minus parses at the additive level
+// The levels the spec declares non-associative (the relation arrows and ⦂,
+// the interval, the exponent) take at most one operator, because their
+// operands are the next tighter level on both sides: `A ↔ B ↔ C`,
+// `1 ‥ 2 ‥ 3` and `2 ^ 3 ^ 4` have no parse. That is grammar.pest's ladder,
+// where `relation_type_expr`, `relational_expr` and `exponent_expr` each
+// spell the operator `(… )?`, and it is Rodin's answer too: a chain is
+// allowed only for a pair in `BMath.addOperatorRelationships()`, `^` and `‥`
+// appear in none of those calls, and `BMathV2` drops the arrow
+// self-compatibilities `BMathV1` had. The set operator compatibility matrix
+// (Table 3.2) stays a semantic check: it is asymmetric (`∩ ▷` is accepted,
+// `▷ ∩` is not) and so does not reduce to a precedence ladder.
+// Unary minus parses at the additive level
 // (kernel_lang §3.3.4 ⟨arithmetic-expr⟩ ::= ['-'] ⟨term⟩ …), matching
 // rossi's grammar.pest: the sign takes a whole multiplicative or
 // exponent term (`-a*b` is `-(a*b)`) while an additive continuation stays
-// outside (`-a+b` keeps `(-a)+b`). One permissive corner: after `^` the
-// sign also swallows a following tight chain (`2^-3*4` groups as
-// `2^(-(3*4))` where pest reads `(2^(-3))*4`) — no corpus source spells
-// a minus after `^`, and this grammar's job is structure, not rejection.
+// outside (`-a+b` keeps `(-a)+b`). After `^` it binds tightly instead, or
+// the term it took would re-enter the exponent level and carry a second `^`
+// past the check above; see `_exponent_operand`.
 const EXPR = {
   quantified: 1,
   maplet: 2,
@@ -230,7 +263,7 @@ export default grammar({
     [$._postfix_head, $.predicate_application],
     // In `{x, …` an identifier is either a comprehension binder or the first
     // element of a set enumeration (or the expression form's element).
-    [$.typed_identifier, $._expression],
+    [$.typed_identifier, $._closed_expression],
     // An action's identifier list is shared by all three assignment forms
     // until the operator (≔, :∈, :∣) decides among them.
     [$.assignment, $.becomes_member, $.becomes_such],
@@ -565,10 +598,20 @@ export default grammar({
     // Expressions
     // ==========================
 
-    _expression: ($) =>
+    // The top of the operator ladder below: the maplet level, or anything
+    // that binds tighter. It has to reach the bottom of the ladder by that
+    // one path, or a reduction to it and a reduction to a level in between
+    // would be indistinguishable.
+    _expression: ($) => choice($.binary_expression, $._arrow_expr),
+
+    // The bottom of the ladder below: a prefix operator, or a form whose own
+    // delimiters close it. Only `unary_expression` reaches back up the ladder,
+    // through the multiplicative term its minus sign takes, which is why the
+    // exponent operand names the two halves separately.
+    _simple_expression: ($) => choice($.unary_expression, $._closed_expression),
+
+    _closed_expression: ($) =>
       choice(
-        $.binary_expression,
-        $.unary_expression,
         $.inverse_expression,
         $.relational_image,
         $.closed_unary_expression,
@@ -605,67 +648,142 @@ export default grammar({
     // identifier spellings differ from the exact operator spelling.
     _identifier_like: ($) => alias('not', $.identifier),
 
-    binary_expression: ($) => {
-      // [level, operator] — variant spellings alias to the canonical
-      // operator, so consumers and queries see a single spelling. U+E100–E103
-      // are the Rodin private-use code points for the relation-set arrows and
-      // relational override; the first three have no real Unicode equivalent,
-      // so their ASCII spellings are the canonical ones.
-      const table = [
-        // Set-of-relations constructors (and rossi's ⦂ type ascription),
-        // tighter than the maplet, looser than the binary set operators.
-        [EXPR.arrow, op('↔', '<->')],
-        [EXPR.arrow, op('<<->', '')],
-        [EXPR.arrow, op('<->>', '')],
-        [EXPR.arrow, op('<<->>', '')],
-        [EXPR.arrow, op('⇸', '+->')],
-        [EXPR.arrow, op('→', '-->')],
-        [EXPR.arrow, op('⤔', '>+>')],
-        [EXPR.arrow, op('↣', '>->')],
-        [EXPR.arrow, op('⤀', '+>>', '+->>')],
-        [EXPR.arrow, op('↠', '->>', '-->>')],
-        [EXPR.arrow, op('⤖', '>->>')],
-        [EXPR.arrow, op('⦂', 'oftype')],
-        // Pair constructor (maplet), the loosest binary operator,
-        // left-associative; `,,` is an accepted input spelling for ↦.
-        [EXPR.maplet, op('↦', '|->', ',,')],
-        // Binary set operators.
-        [EXPR.setop, op('∪', '\\/')],
-        [EXPR.setop, op('∩', '/\\')],
-        [EXPR.setop, op('∖', '\\')],
-        [EXPR.setop, op('×', '**')],
-        [EXPR.setop, ';'],
-        [EXPR.setop, op('∘', 'circ')],
-        [EXPR.setop, op('<+', '')],
-        [EXPR.setop, op('◁', '<|')],
-        [EXPR.setop, op('⩤', '<<|')],
-        [EXPR.setop, op('▷', '|>')],
-        [EXPR.setop, op('⩥', '|>>')],
-        [EXPR.setop, op('⊗', '><')],
-        [EXPR.setop, op('∥', '||')],
-        // Interval constructor.
-        [EXPR.interval, op('‥', '..')],
-        // Arithmetic.
-        [EXPR.additive, '+'],
-        [EXPR.additive, op('−', '-')],
-        [EXPR.multiplicative, op('∗', '*')],
-        [EXPR.multiplicative, op('÷', '/')],
-        [EXPR.multiplicative, 'mod'],
-        [EXPR.exponent, '^'],
-      ];
-      return choice(
-        ...table.map(([level, operator]) =>
-          prec.left(
-            level,
-            seq(
-              field('left', $._expression),
-              field('operator', operator),
-              field('right', $._expression),
-            ),
-          ),
+    // The binary operators form grammar.pest's ladder: each `_binary_*` rule
+    // names the levels its operands may reach, and each `_*_expr` rule is
+    // "this level or anything tighter". A level that folds left takes itself
+    // on the left and the next tighter level on the right; a non-associative
+    // level takes the next tighter level on both sides, so it cannot chain.
+    // Every level surfaces as one `binary_expression` node.
+    //
+    // Variant spellings alias to the canonical operator, so consumers and
+    // queries see a single spelling. U+E100-E103 are the Rodin private-use
+    // code points for the relation-set arrows and relational override; the
+    // first three have no real Unicode equivalent, so their ASCII spellings
+    // are the canonical ones.
+
+    // The loosest level, the pair constructor (maplet), carries the node name
+    // every level surfaces as; it is left-associative, and `,,` is an
+    // accepted input spelling for ↦.
+    binary_expression: ($) =>
+      binaryLevel(EXPR.maplet, $._expression, $._arrow_expr, [
+        op('↦', '|->', ',,'),
+      ]),
+
+    // Set-of-relations constructors (and rossi's ⦂ type ascription),
+    // tighter than the maplet, looser than the binary set operators, and
+    // non-associative: `a ↦ b ↔ c` is `a ↦ (b ↔ c)`, `a ↔ b ↔ c` is nothing.
+    _arrow_expr: ($) =>
+      choice(alias($._binary_arrow, $.binary_expression), $._setop_expr),
+
+    _binary_arrow: ($) =>
+      binaryLevel(EXPR.arrow, $._setop_expr, $._setop_expr, [
+        op('↔', '<->'),
+        op('<<->', ''),
+        op('<->>', ''),
+        op('<<->>', ''),
+        op('⇸', '+->'),
+        op('→', '-->'),
+        op('⤔', '>+>'),
+        op('↣', '>->'),
+        op('⤀', '+>>', '+->>'),
+        op('↠', '->>', '-->>'),
+        op('⤖', '>->>'),
+        op('⦂', 'oftype'),
+      ]),
+
+    // Binary set operators. These do chain; which pairs may is Table 3.2, an
+    // asymmetric relation left to semantic tooling.
+    _setop_expr: ($) =>
+      choice(alias($._binary_setop, $.binary_expression), $._interval_expr),
+
+    _binary_setop: ($) =>
+      binaryLevel(EXPR.setop, $._setop_expr, $._interval_expr, [
+        op('∪', '\\/'),
+        op('∩', '/\\'),
+        op('∖', '\\'),
+        op('×', '**'),
+        ';',
+        op('∘', 'circ'),
+        op('<+', ''),
+        op('◁', '<|'),
+        op('⩤', '<<|'),
+        op('▷', '|>'),
+        op('⩥', '|>>'),
+        op('⊗', '><'),
+        op('∥', '||'),
+      ]),
+
+    // Interval constructor, non-associative: the spec (p.19) calls
+    // `a ‥ b ‥ c` nonsensical and parses `‥` as taking one operator.
+    _interval_expr: ($) =>
+      choice(alias($._binary_interval, $.binary_expression), $._additive_expr),
+
+    _binary_interval: ($) =>
+      binaryLevel(EXPR.interval, $._additive_expr, $._additive_expr, [
+        op('‥', '..'),
+      ]),
+
+    // Arithmetic. Both levels fold left.
+    _additive_expr: ($) =>
+      choice(
+        alias($._binary_additive, $.binary_expression),
+        $._multiplicative_expr,
+      ),
+
+    _binary_additive: ($) =>
+      binaryLevel(EXPR.additive, $._additive_expr, $._multiplicative_expr, [
+        '+',
+        op('−', '-'),
+      ]),
+
+    _multiplicative_expr: ($) =>
+      choice(
+        alias($._binary_multiplicative, $.binary_expression),
+        $._exponent_expr,
+      ),
+
+    _binary_multiplicative: ($) =>
+      binaryLevel(
+        EXPR.multiplicative,
+        $._multiplicative_expr,
+        $._exponent_expr,
+        [op('∗', '*'), op('÷', '/'), 'mod'],
+      ),
+
+    // Exponent, non-associative and the tightest binary level. Its left
+    // operand is a whole unary term and its right is `_exponent_operand`,
+    // exactly as grammar.pest spells `exponent_expr`.
+    _exponent_expr: ($) =>
+      choice(
+        alias($._binary_exponent, $.binary_expression),
+        $._simple_expression,
+      ),
+
+    _binary_exponent: ($) =>
+      binaryLevel(EXPR.exponent, $._simple_expression, $._exponent_operand, [
+        '^',
+      ]),
+
+    // grammar.pest's `exponent_operand`. A minus after `^` binds tightly:
+    // letting it take a whole multiplicative term would re-enter the exponent
+    // level and smuggle a second `^` past the non-associativity above
+    // (`2^−3^4`), which rossi and Rodin both refuse. Binding it tightly also
+    // makes `2^−3∗4` the `(2^(−3))∗4` that rossi reads.
+    _exponent_operand: ($) =>
+      choice(
+        alias($._tight_negation, $.unary_expression),
+        alias($._powerset, $.unary_expression),
+        $._closed_expression,
+      ),
+
+    _tight_negation: ($) =>
+      prec.left(
+        EXPR.additive,
+        seq(
+          field('operator', op('−', '-')),
+          field('operand', $._exponent_operand),
         ),
-      );
-    },
+      ),
 
     // Prefix unary operators: unary minus and the powersets ℙ/ℙ1 (POW/POW1).
     // Unary minus sits at additive precedence with left resolution, so a
@@ -674,26 +792,28 @@ export default grammar({
     // powersets keep the tight prefix level. The dynamic precedence prefers
     // the operator reading of pow/pow1 over an identifier application when
     // both complete, matching pest's alternative order.
-    unary_expression: ($) =>
-      choice(
-        prec.left(
-          EXPR.additive,
-          seq(
-            field('operator', op('−', '-')),
-            field('operand', $._expression),
-          ),
+    unary_expression: ($) => choice($._negation, $._powerset),
+
+    _negation: ($) =>
+      prec.left(
+        EXPR.additive,
+        seq(
+          field('operator', op('−', '-')),
+          field('operand', $._multiplicative_expr),
         ),
-        prec(
-          EXPR.unary,
-          prec.dynamic(
-            1,
-            seq(
-              field('operator', choice(
-                op('ℙ1', 'POW1'),
-                op('ℙ', 'POW'),
-              )),
-              field('operand', $._expression),
-            ),
+      ),
+
+    _powerset: ($) =>
+      prec(
+        EXPR.unary,
+        prec.dynamic(
+          1,
+          seq(
+            field('operator', choice(
+              op('ℙ1', 'POW1'),
+              op('ℙ', 'POW'),
+            )),
+            field('operand', $._simple_expression),
           ),
         ),
       ),
@@ -723,7 +843,7 @@ export default grammar({
     inverse_expression: ($) =>
       prec.left(
         EXPR.postfix,
-        seq(field('operand', $._expression), op('∼', '~')),
+        seq(field('operand', $._postfix_head), op('∼', '~')),
       ),
 
     // Relational image: r[S].
@@ -731,7 +851,7 @@ export default grammar({
       prec.left(
         EXPR.postfix,
         seq(
-          field('relation', $._expression),
+          field('relation', $._postfix_head),
           '[',
           field('image', $._expression),
           ']',
@@ -847,9 +967,9 @@ export default grammar({
     // What a postfix form may apply to: grammar.pest's primary_expr — atoms,
     // literals, parenthesized expressions, set constructors, and other
     // postfix expressions (so postfixes chain: f(x)[S]∼). Quantified forms
-    // participate via parentheses only. Shared by function application and
-    // the override sugar; relational_image and inverse_expression take a
-    // full expression at postfix precedence, which climbing makes equivalent.
+    // participate via parentheses only. Shared by function application, the
+    // override sugar, relational_image and inverse_expression, which all take
+    // a head rather than a whole expression: `a ∪ b∼` is `a ∪ (b∼)`.
     _postfix_head: ($) =>
       choice(
         $.identifier,
