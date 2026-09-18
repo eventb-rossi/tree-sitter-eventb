@@ -363,6 +363,10 @@
             "named": false
           },
           {
+            "type": "infix_operator",
+            "named": true
+          },
+          {
             "type": "mod",
             "named": false
           },
@@ -2412,6 +2416,10 @@
   },
   {
     "type": "identifier",
+    "named": true
+  },
+  {
+    "type": "infix_operator",
     "named": true
   },
   {
