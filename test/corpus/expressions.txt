@@ -500,3 +500,62 @@ end
             (unary_expression
               (identifier))
             (identifier)))))))
+
+================================================================================
+postfix: a comma list in expression application
+================================================================================
+
+context C
+  axioms
+    @g x = c(1, 2)
+    @h f(a, b) = c
+    @i f(a, b) ∧ g(c) = d
+    @j f(a ↦ b)(c, d) = e
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (function_application
+            function: (identifier)
+            argument: (number)
+            argument: (number))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (function_application
+            function: (identifier)
+            argument: (identifier)
+            argument: (identifier))
+          right: (identifier)))
+      (axiom
+        label: (label)
+        predicate: (binary_predicate
+          left: (predicate_application
+            function: (identifier)
+            argument: (identifier)
+            argument: (identifier))
+          right: (comparison_predicate
+            left: (function_application
+              function: (identifier)
+              argument: (identifier))
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (function_application
+            function: (function_application
+              function: (identifier)
+              argument: (binary_expression
+                left: (identifier)
+                right: (identifier)))
+            argument: (identifier)
+            argument: (identifier))
+          right: (identifier))))))
