@@ -32,7 +32,9 @@ looser than the relation-set arrows and `⦂` (kernel_lang Table 3.1), so
 - **Predicates**: `⇔`/`⇒` (one precedence level) and `∨`/`∧` (one level),
   `¬`, `∀`/`∃` with typed binders, comparisons (non-associative by
   construction), `finite`/`partition` applications.
-- **Expressions**: the full §3.3 operator hierarchy — the maplet, relation
+- **Expressions**: the full §3.3 operator hierarchy — the maplet, the
+  user-defined infix operator words of a formula factory (`a plus b`, one
+  level above the maplet), relation
   arrows, binary set operators, intervals, arithmetic, prefix powersets,
   the closed unary words `card`/`dom`/`max`/`min`/`ran`, which mandate their
   parentheses, application/image/converse — plus set

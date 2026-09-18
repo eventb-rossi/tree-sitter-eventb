@@ -559,3 +559,150 @@ end
             argument: (identifier)
             argument: (identifier))
           right: (identifier))))))
+
+================================================================================
+infix operator words: one level above the maplet, below the arrows
+================================================================================
+
+context C
+  axioms
+    @a x = a plus b
+    @b y = a ↦ b plus c
+    @c z = a plus b ↦ c
+    @d w = a plus b ↔ c
+    @e v = a plus b plus c
+    @f u = a plus b + c
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            operator: (infix_operator)
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (binary_expression
+              left: (identifier)
+              operator: (infix_operator)
+              right: (identifier)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              operator: (infix_operator)
+              right: (identifier))
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            operator: (infix_operator)
+            right: (binary_expression
+              left: (identifier)
+              right: (identifier)))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              operator: (infix_operator)
+              right: (identifier))
+            operator: (infix_operator)
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            operator: (infix_operator)
+            right: (binary_expression
+              left: (identifier)
+              right: (identifier))))))))
+
+================================================================================
+infix operator words: keywords after an operand are still keywords
+================================================================================
+
+context C
+  axioms
+    @g p = 1 or q = 2
+    @h r = a mod b
+    @i s = a circ b
+end
+
+machine M
+  variables x y
+  events
+    event e
+      then
+        @a x ≔ y plus x
+      end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    name: (identifier)
+    (axioms_clause
+      (axiom
+        label: (label)
+        predicate: (binary_predicate
+          left: (comparison_predicate
+            left: (identifier)
+            right: (number))
+          right: (comparison_predicate
+            left: (identifier)
+            right: (number))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (identifier))))
+      (axiom
+        label: (label)
+        predicate: (comparison_predicate
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (identifier))))))
+  (machine
+    name: (identifier)
+    (variables_clause
+      (identifier)
+      (identifier))
+    (events_clause
+      (event
+        name: (identifier)
+        (then_clause
+          (action
+            label: (label)
+            (assignment
+              left: (identifier)
+              right: (binary_expression
+                left: (identifier)
+                operator: (infix_operator)
+                right: (identifier)))))))))

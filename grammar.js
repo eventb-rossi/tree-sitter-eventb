@@ -171,14 +171,15 @@ const PRED = {
 const EXPR = {
   quantified: 1,
   maplet: 2,
-  arrow: 3,
-  setop: 4,
-  interval: 5,
-  additive: 6,
-  multiplicative: 7,
-  exponent: 8,
-  unary: 9,
-  postfix: 10,
+  infix: 3,
+  arrow: 4,
+  setop: 5,
+  interval: 6,
+  additive: 7,
+  multiplicative: 8,
+  exponent: 9,
+  unary: 10,
+  postfix: 11,
 };
 
 // Rodin's identifier alphabet (rossi's grammar.pest `ident_start` and
@@ -636,7 +637,7 @@ export default grammar({
     // that binds tighter. It has to reach the bottom of the ladder by that
     // one path, or a reduction to it and a reduction to a level in between
     // would be indistinguishable.
-    _expression: ($) => choice($.binary_expression, $._arrow_expr),
+    _expression: ($) => choice($.binary_expression, $._infix_expr),
 
     // The bottom of the ladder below: a prefix operator, or a form whose own
     // delimiters close it. Only `unary_expression` reaches back up the ladder,
@@ -699,8 +700,33 @@ export default grammar({
     // every level surfaces as; it is left-associative, and `,,` is an
     // accepted input spelling for ↦.
     binary_expression: ($) =>
-      binaryLevel(EXPR.maplet, $._expression, $._arrow_expr, [
+      binaryLevel(EXPR.maplet, $._expression, $._infix_expr, [
         op('↦', '|->', ',,'),
+      ]),
+
+    // User-defined infix operators (rossi's grammar.pest `infix_ext_expr`): a
+    // bare word between two expressions, one level above the pair
+    // constructor and below every other binary level, where Rodin's
+    // extension mechanism places its infix group: `a ↦ b plus c` is
+    // `a ↦ (b plus c)`, `a plus b ↦ c` is `(a plus b) ↦ c`, `a plus b ↔ c`
+    // is `a plus (b ↔ c)`. The word is an identifier. A keyword or operator
+    // word that is valid after an expression (`end`, `then`, `or`, `mod`)
+    // wins by keyword extraction, so every clause still closes and every
+    // core operator still binds; one that is not valid there (`a not b`,
+    // `a POW b`) reads as an operator word here, because tree-sitter lexes
+    // the lookahead before it knows the operator slot is next (rossi's
+    // grammar.pest guards the slot with its `reserved_word` rule, and rossi
+    // refuses the word when it builds the AST). Which words a model's
+    // formula factory defines, whether a chain mixes operators, and whether
+    // an operand may be an unparenthesised chain of a lower level (`a plus b
+    // + c`) are rossi's AST builder's business too, so none of that is
+    // encoded here.
+    _infix_expr: ($) =>
+      choice(alias($._binary_infix, $.binary_expression), $._arrow_expr),
+
+    _binary_infix: ($) =>
+      binaryLevel(EXPR.infix, $._infix_expr, $._arrow_expr, [
+        alias($.identifier, $.infix_operator),
       ]),
 
     // Set-of-relations constructors (and rossi's ⦂ type ascription),

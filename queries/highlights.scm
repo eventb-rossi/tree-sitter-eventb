@@ -123,6 +123,9 @@
   ":∣"
 ] @operator
 
+; A user-defined infix operator is a word; it is an operator nonetheless.
+(infix_operator) @operator
+
 ; The closed operator words that are functions rather than relational
 ; operators; `dom`/`ran` sit with the operators above.
 [
