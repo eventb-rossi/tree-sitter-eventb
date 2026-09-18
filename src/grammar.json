@@ -64,17 +64,21 @@
       ]
     },
     "_component_name": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "identifier"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "component_name"
-        }
-      ]
+      "type": "RESERVED",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "identifier"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "component_name"
+          }
+        ]
+      },
+      "context_name": "structural_name"
     },
     "component_name": {
       "type": "SEQ",
@@ -2184,45 +2188,13 @@
       ]
     },
     "_identifier_like": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "STRING",
-            "value": "dom"
-          },
-          "named": true,
-          "value": "identifier"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "STRING",
-            "value": "ran"
-          },
-          "named": true,
-          "value": "identifier"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "STRING",
-            "value": "not"
-          },
-          "named": true,
-          "value": "identifier"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "[tT][hH][eE][oO][rR][eE][mM]"
-          },
-          "named": true,
-          "value": "identifier"
-        }
-      ]
+      "type": "ALIAS",
+      "content": {
+        "type": "STRING",
+        "value": "not"
+      },
+      "named": true,
+      "value": "identifier"
     },
     "binary_expression": {
       "type": "CHOICE",
@@ -3875,7 +3847,19 @@
               "members": [
                 {
                   "type": "STRING",
+                  "value": "card"
+                },
+                {
+                  "type": "STRING",
                   "value": "dom"
+                },
+                {
+                  "type": "STRING",
+                  "value": "max"
+                },
+                {
+                  "type": "STRING",
+                  "value": "min"
                 },
                 {
                   "type": "STRING",
@@ -4794,8 +4778,13 @@
                 "name": "_identifier_like"
               },
               {
-                "type": "SYMBOL",
-                "name": "builtin"
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_closed_predicate"
+                },
+                "named": true,
+                "value": "builtin"
               }
             ]
           }
@@ -4978,27 +4967,7 @@
         "members": [
           {
             "type": "STRING",
-            "value": "card"
-          },
-          {
-            "type": "STRING",
-            "value": "finite"
-          },
-          {
-            "type": "STRING",
             "value": "id"
-          },
-          {
-            "type": "STRING",
-            "value": "max"
-          },
-          {
-            "type": "STRING",
-            "value": "min"
-          },
-          {
-            "type": "STRING",
-            "value": "partition"
           },
           {
             "type": "STRING",
@@ -5015,6 +4984,22 @@
           {
             "type": "STRING",
             "value": "succ"
+          }
+        ]
+      }
+    },
+    "_closed_predicate": {
+      "type": "TOKEN",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "finite"
+          },
+          {
+            "type": "STRING",
+            "value": "partition"
           }
         ]
       }
@@ -5090,10 +5075,6 @@
       "_expression"
     ],
     [
-      "_identifier_like",
-      "labeled_predicate"
-    ],
-    [
       "assignment",
       "becomes_member",
       "becomes_such"
@@ -5106,5 +5087,57 @@
     "_expression",
     "_predicate"
   ],
-  "reserved": {}
+  "reserved": {
+    "global": [
+      {
+        "type": "STRING",
+        "value": "bool"
+      },
+      {
+        "type": "STRING",
+        "value": "card"
+      },
+      {
+        "type": "STRING",
+        "value": "dom"
+      },
+      {
+        "type": "STRING",
+        "value": "max"
+      },
+      {
+        "type": "STRING",
+        "value": "min"
+      },
+      {
+        "type": "STRING",
+        "value": "mod"
+      },
+      {
+        "type": "STRING",
+        "value": "ran"
+      },
+      {
+        "type": "SYMBOL",
+        "name": "builtin"
+      },
+      {
+        "type": "SYMBOL",
+        "name": "_closed_predicate"
+      },
+      {
+        "type": "SYMBOL",
+        "name": "bool_set"
+      },
+      {
+        "type": "SYMBOL",
+        "name": "bool_true"
+      },
+      {
+        "type": "SYMBOL",
+        "name": "bool_false"
+      }
+    ],
+    "structural_name": []
+  }
 }

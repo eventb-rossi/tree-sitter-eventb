@@ -123,7 +123,14 @@
   ":∣"
 ] @operator
 
-"bool" @function.builtin
+; The closed operator words that are functions rather than relational
+; operators; `dom`/`ran` sit with the operators above.
+[
+  "bool"
+  "card"
+  "max"
+  "min"
+] @function.builtin
 
 [
   (true)

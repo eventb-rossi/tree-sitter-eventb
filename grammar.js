@@ -175,6 +175,47 @@ export default grammar({
   // elsewhere. This is what makes keywords reserved words.
   word: ($) => $.identifier,
 
+  // The kernel_lang §2.2 reserved words, which can never be an identifier —
+  // not bare in a formula and not as a declared name. Keyword extraction
+  // alone covers only the first half: where the word's own token is not
+  // valid, it would otherwise fall back to `identifier`, and `variables card`
+  // would parse. Rodin's `isValidIdentifierName` refuses exactly these
+  // spellings, exact case (`Dom`, `CARD`, `Union` are ordinary identifiers),
+  // and rossi's `is_reserved_word` mirrors it.
+  //
+  // `union` and `inter` are §2.2 words that this list leaves out on purpose:
+  // they name the generalized set operators, which neither this grammar nor
+  // rossi models, so reserving them would reject `union(S)`, which is
+  // Event-B. rossi's ASCII operator spellings (`circ`, `not`, `oftype`,
+  // `or`, `POW`, `POW1`) are absent for the opposite reason: they are this
+  // dialect's own extension and Rodin reads them as identifiers.
+  // A reserved word must name a token, so the words that share one token
+  // (`builtin` is id/pred/prj1/prj2/succ, `_closed_predicate` is
+  // finite/partition) are listed by their rule.
+  reserved: {
+    global: ($) => [
+      'bool',
+      'card',
+      'dom',
+      'max',
+      'min',
+      'mod',
+      'ran',
+      $.builtin,
+      $._closed_predicate,
+      $.bool_set,
+      $.bool_true,
+      $.bool_false,
+    ],
+
+    // Nothing is reserved in a component or event name. Those are Rodin file
+    // names and labels, which `isValidIdentifierName` never sees: the model
+    // corpus has a context named `partition` that machines `sees`, and rossi
+    // accepts it too, checking `is_reserved_word` only where a *mathematical*
+    // identifier is being named.
+    structural_name: (_) => [],
+  },
+
   // Hidden choice rules exposed as supertypes in node-types.json, so query
   // authors and typed-binding generators can say "any expression" without
   // enumerating (and drifting from) the alternatives.
@@ -190,9 +231,6 @@ export default grammar({
     // In `{x, …` an identifier is either a comprehension binder or the first
     // element of a set enumeration (or the expression form's element).
     [$.typed_identifier, $._expression],
-    // `theorem` after a label flags the predicate, or starts it as an
-    // identifier expression.
-    [$._identifier_like, $.labeled_predicate],
     // An action's identifier list is shared by all three assignment forms
     // until the operator (≔, :∈, :∣) decides among them.
     [$.assignment, $.becomes_member, $.becomes_such],
@@ -217,7 +255,8 @@ export default grammar({
     // (ENV_C-1). The hyphen parts attach with token.immediate so a name is
     // distinguished from subtraction; in name positions no expression is
     // valid anyway.
-    _component_name: ($) => choice($.identifier, $.component_name),
+    _component_name: ($) =>
+      reserved('structural_name', choice($.identifier, $.component_name)),
 
     component_name: ($) =>
       seq($.identifier, repeat1(token.immediate(/-[a-zA-Z0-9_]+/))),
@@ -555,23 +594,16 @@ export default grammar({
         $._identifier_like,
       ),
 
-    // The exact-case operator words that can also name a constant or variable
-    // fall back to ordinary identifiers, like rossi where the AST builder reads
-    // a bare `dom`/`ran`/`not` as an identifier (then rejects it as reserved —
-    // a semantic check left to tooling). The uppercase operators (POW, UNION,
-    // …) and the now-keyword-free `if`/`union`/`inter`/`pow` need no fallback:
-    // their identifier spellings differ from the exact operator spelling, so
-    // they already lex as plain identifiers. `theorem` stays case-insensitive
-    // (a structural flag). GLR keeps both readings alive until the
-    // continuation decides; dynamic precedence on the operator rules prefers
-    // the operator reading on ties, matching pest's alternative order.
-    _identifier_like: ($) =>
-      choice(
-        alias('dom', $.identifier),
-        alias('ran', $.identifier),
-        alias('not', $.identifier),
-        alias(ci('theorem'), $.identifier),
-      ),
+    // `not` is one of rossi's ASCII operator spellings, not a word of the
+    // kernel language: Rodin is Unicode-only there (`¬`) and accepts `not` as
+    // an ordinary identifier, so rossi's `ASCII_OPERATOR_WORDS` leaves it
+    // usable as a name and this fallback keeps it parsing as one. GLR holds
+    // both readings until the continuation decides; the dynamic precedence on
+    // `not_predicate` prefers the operator on ties, matching pest's
+    // alternative order. The uppercase operators (POW, UNION, …) and the
+    // keyword-free `if`/`union`/`inter`/`pow` need no fallback: their
+    // identifier spellings differ from the exact operator spelling.
+    _identifier_like: ($) => alias('not', $.identifier),
 
     binary_expression: ($) => {
       // [level, operator] — variant spellings alias to the canonical
@@ -666,15 +698,21 @@ export default grammar({
         ),
       ),
 
-    // Closed unary application: dom(E) / ran(E), with mandatory parentheses
-    // (Rodin's UnaryExpressionParser; kernel_lang §3.3.6 ⟨unary-op⟩ '(' E ')').
+    // Closed unary application, with mandatory parentheses (Rodin's
+    // UnaryExpressionParser; kernel_lang §3.3.6 ⟨unary-op⟩ '(' E ')'). These
+    // are Rodin's `CLOSED` operator group, whose `parseRight` opens with an
+    // unconditional `acceptOpenParen()`, so the word is meaningless bare:
+    // kernel_lang §3.3.3 calls them bounded, "always followed by a formula
+    // enclosed within parenthesis". `union`/`inter` belong to the group too,
+    // but neither this grammar nor rossi models the generalized set
+    // operators, so their spellings stay ordinary identifiers here.
     // Sits at postfix precedence as a postfix head so it binds like Rodin:
     // dom(f)(x) = (dom(f))(x), dom(f)∼ = (dom(f))∼.
     closed_unary_expression: ($) =>
       prec.left(
         EXPR.postfix,
         seq(
-          field('operator', choice('dom', 'ran')),
+          field('operator', choice('card', 'dom', 'max', 'min', 'ran')),
           '(',
           field('operand', $._expression),
           ')',
@@ -866,7 +904,14 @@ export default grammar({
     // until the continuation decides, and `x = c(1, 2)` has no reading.
     predicate_application: ($) =>
       seq(
-        field('function', choice($.identifier, $._identifier_like, $.builtin)),
+        field(
+          'function',
+          choice(
+            $.identifier,
+            $._identifier_like,
+            alias($._closed_predicate, $.builtin),
+          ),
+        ),
         '(',
         commaSep1(field('argument', $._expression)),
         ')',
@@ -893,22 +938,17 @@ export default grammar({
     natural1_set: ($) => token(choice('ℕ1', 'NAT1')),
     bool_set: ($) => token('BOOL'),
     empty_set: ($) => token(choice('∅', '{}')),
-    // Support functions/predicates — exact-case (lowercase) reserved words.
-    builtin: ($) =>
-      token(
-        choice(
-          'card',
-          'finite',
-          'id',
-          'max',
-          'min',
-          'partition',
-          'pred',
-          'prj1',
-          'prj2',
-          'succ',
-        ),
-      ),
+    // The generic atoms of kernel_lang §2.2: Rodin's `ATOMIC_EXPR` group,
+    // whose parser consumes nothing after the word, so unlike the closed
+    // operators these stand bare (`r = id`, `p = prj1 ⦂ T`).
+    builtin: ($) => token(choice('id', 'pred', 'prj1', 'prj2', 'succ')),
+
+    // The two closed predicate words. Like the closed unary operators they
+    // mandate their parentheses (Rodin reaches them through `FiniteParser`
+    // and `MultiplePredicateParser`, both of which call `acceptOpenParen()`),
+    // so they are reachable only as a predicate-application head. Aliased to
+    // `builtin` so they keep one highlight and one node name.
+    _closed_predicate: ($) => token(choice('finite', 'partition')),
 
     // ==========================
     // Lexical tokens

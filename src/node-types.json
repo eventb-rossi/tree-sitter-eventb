@@ -563,7 +563,19 @@
         "required": true,
         "types": [
           {
+            "type": "card",
+            "named": false
+          },
+          {
             "type": "dom",
+            "named": false
+          },
+          {
+            "type": "max",
+            "named": false
+          },
+          {
+            "type": "min",
             "named": false
           },
           {
@@ -2007,6 +2019,10 @@
     "named": true
   },
   {
+    "type": "card",
+    "named": false
+  },
+  {
     "type": "comment",
     "named": true,
     "extra": true
@@ -2069,6 +2085,14 @@
   },
   {
     "type": "machine",
+    "named": false
+  },
+  {
+    "type": "max",
+    "named": false
+  },
+  {
+    "type": "min",
     "named": false
   },
   {

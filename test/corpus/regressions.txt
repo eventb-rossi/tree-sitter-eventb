@@ -321,20 +321,18 @@ end
             (number)))))))
 
 ================================================================================
-operator words as identifiers: dom, ran, pow, not, if, theorem
+ASCII operator spellings and keyword-shaped words as identifiers
 ================================================================================
 
 machine M
-  variables dom ran pow
+  variables pow not
   invariants
-    @i1 dom ∈ ℕ
-    @i2 theorem ∈ ℕ
+    @i1 pow ∈ ℕ
   events
     event e any if where
       @g if > 0
     then
-      @a dom ≔ ran(f)
-      @b not ≔ pow + 1
+      @a pow ≔ not + 1
     end
 end
 
@@ -345,14 +343,8 @@ end
     (identifier)
     (variables_clause
       (identifier)
-      (identifier)
       (identifier))
     (invariants_clause
-      (invariant
-        (label)
-        (comparison_predicate
-          (identifier)
-          (natural_set)))
       (invariant
         (label)
         (comparison_predicate
@@ -370,12 +362,6 @@ end
               (identifier)
               (number))))
         (then_clause
-          (action
-            (label)
-            (assignment
-              (identifier)
-              (closed_unary_expression
-                (identifier))))
           (action
             (label)
             (assignment
@@ -466,3 +452,30 @@ end
             (identifier)
             (identifier))
           (number))))))
+
+================================================================================
+a reserved word may name a component or an event
+================================================================================
+
+context partition
+end
+
+machine M
+  sees partition
+  events
+    event max
+    end
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    (identifier))
+  (machine
+    (identifier)
+    (sees_clause
+      (identifier))
+    (events_clause
+      (event
+        (identifier)))))

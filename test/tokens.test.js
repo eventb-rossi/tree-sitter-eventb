@@ -70,6 +70,12 @@ function parseOk(source, spelling) {
   return root;
 }
 
+/** Parse and assert the tree carries an error; feeds no coverage sets. */
+function parseFails(source, why) {
+  const root = parser.parse(source).rootNode;
+  assert.equal(root.hasError, true, `${why}: ${JSON.stringify(source)} parsed as ${root.toString()}`);
+}
+
 /** Collect all node types in the tree (named and anonymous). */
 function nodeTypes(root) {
   const out = new Set();
@@ -182,17 +188,50 @@ test("every constant spelling parses as its named node", () => {
   }
 });
 
-test("every builtin spelling parses as a builtin node", () => {
+// The kernel_lang §2.2 words split by whether they mandate a parenthesized
+// argument, which is rossi's `RESERVED_OPERATOR_WORDS` split: `card`, `max`
+// and `min` are closed unary expressions, `finite` and `partition` closed
+// predicates, and the rest are the generic atoms that stand bare.
+const CLOSED_EXPR_BUILTINS = new Set(["card", "max", "min"]);
+const CLOSED_PRED_BUILTINS = new Set(["finite", "partition"]);
+
+/** The template that applies `spelling`, and the node it must produce. */
+function builtinTemplate(spelling) {
+  if (CLOSED_EXPR_BUILTINS.has(spelling)) {
+    return { src: `context C axioms @a x = ${spelling}(S) end`, node: "closed_unary_expression" };
+  }
+  if (CLOSED_PRED_BUILTINS.has(spelling)) {
+    return { src: `context C axioms @a ${spelling}(S) end`, node: "builtin" };
+  }
+  return { src: `context C axioms @a x = ${spelling} end`, node: "builtin" };
+}
+
+test("every builtin spelling parses as its named node", () => {
   for (const spelling of manifest.builtin) {
     // Builtins are exact-case reserved words (not re-tested in uppercase).
-    const root = parseOk(`context C axioms @a x = ${spelling} end`, spelling);
+    const t = builtinTemplate(spelling);
+    const root = parseOk(t.src, spelling);
     assert.ok(
-      nodeTypes(root).has("builtin"),
-      `expected ${JSON.stringify(spelling)} to produce a (builtin) node: ${root.toString()}`,
+      nodeTypes(root).has(t.node),
+      `expected ${JSON.stringify(spelling)} to produce a (${t.node}) node: ${root.toString()}`,
     );
-    // Applied, with the one argument an expression application takes; the
-    // comma list belongs to predicate application (partition(S, A, B)).
-    parseOk(`context C axioms @a x = ${spelling}(S) end`, spelling);
+  }
+});
+
+test("a closed builtin is meaningless bare or misapplied", () => {
+  for (const spelling of [...CLOSED_EXPR_BUILTINS, ...CLOSED_PRED_BUILTINS]) {
+    parseFails(`context C axioms @a x = ${spelling} end`, "bare closed builtin");
+    parseFails(`machine M variables ${spelling} end`, "closed builtin as a name");
+  }
+  // The comma list belongs to predicate application alone.
+  parseFails("context C axioms @a x = card(S, T) end", "closed unary takes one argument");
+  parseFails("context C axioms @a x = card[S] end", "a closed word is not a relation");
+});
+
+test("a generic atom stands bare but still cannot name anything", () => {
+  for (const spelling of manifest.builtin) {
+    if (CLOSED_EXPR_BUILTINS.has(spelling) || CLOSED_PRED_BUILTINS.has(spelling)) continue;
+    parseFails(`machine M variables ${spelling} end`, "reserved atom as a name");
   }
 });
 

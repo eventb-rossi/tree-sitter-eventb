@@ -34,7 +34,8 @@ looser than the relation-set arrows and `⦂` (kernel_lang Table 3.1), so
   construction), `finite`/`partition` applications.
 - **Expressions**: the full §3.3 operator hierarchy — the maplet, relation
   arrows, binary set operators, intervals, arithmetic, prefix powersets,
-  closed `dom(E)`/`ran(E)`, application/image/converse — plus set
+  the closed unary words `card`/`dom`/`max`/`min`/`ran`, which mandate their
+  parentheses, application/image/converse — plus set
   enumerations and comprehensions, `λ` patterns, quantified `⋃`/`⋂`, the
   boolean atoms (predicate literals `⊤`/`⊥`, values `TRUE`/`FALSE`, the
   `BOOL` type), `bool(P)`, `⦂` type ascription, and Rodin-isms such as
