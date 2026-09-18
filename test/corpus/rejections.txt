@@ -1,0 +1,20 @@
+; Text that is not Event-B, pinned as rejected.
+;
+; Each case is a construct rossi's parser and Rodin both refuse and this
+; grammar once accepted (docs/parsers_discrepancies.md §4 in the rossi
+; monorepo). The `:error` attribute asserts the parse carries an ERROR or
+; MISSING node without pinning the recovery tree, which is not part of the
+; contract and changes whenever a neighbouring rule does.
+
+================================================================================
+sets: the classical B enumerated declaration
+:error
+================================================================================
+
+context C
+  sets S = {a, b, c}
+end
+
+--------------------------------------------------------------------------------
+
+(source_file)

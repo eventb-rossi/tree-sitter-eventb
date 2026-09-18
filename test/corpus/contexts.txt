@@ -33,11 +33,11 @@ end
       (identifier))))
 
 ================================================================================
-context: deferred and enumerated sets
+context: deferred sets
 ================================================================================
 
 context C2
-  sets S T = {a, b, c} U
+  sets S T U
 end
 
 --------------------------------------------------------------------------------
@@ -49,10 +49,7 @@ end
       (set_declaration
         name: (identifier))
       (set_declaration
-        name: (identifier)
-        (identifier)
-        (identifier)
-        (identifier))
+        name: (identifier))
       (set_declaration
         name: (identifier)))))
 

@@ -236,12 +236,14 @@ export default grammar({
 
     sets_clause: ($) => seq(kw('sets'), spaceSep1($.set_declaration)),
 
-    // Deferred set (S) or enumerated set (S = {a, b, c}).
-    set_declaration: ($) =>
-      seq(
-        field('name', $.identifier),
-        optional(seq('=', '{', commaSep1($.identifier), '}')),
-      ),
+    // A carrier set is a name and nothing else. The enumerated form
+    // `S = {a, b, c}` belongs to classical B (probparsers' `BParser.scc`
+    // spells it `enumerated_set`), not to Event-B: Camille's `EventBParser.scc`
+    // declares an `=` token and uses it in no production, Rodin's
+    // `contextFile.dtd` gives `carrierSet` an EMPTY content model, and rossi's
+    // grammar.pest `context_clause_sets` takes identifiers only. The node is
+    // kept so a set name still highlights differently from a constant.
+    set_declaration: ($) => field('name', $.identifier),
 
     constants_clause: ($) => seq(kw('constants'), spaceSep1($.identifier)),
 
