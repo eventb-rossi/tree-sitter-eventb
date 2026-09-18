@@ -118,15 +118,15 @@
         "named": true
       },
       {
-        "type": "function_application",
-        "named": true
-      },
-      {
         "type": "not_predicate",
         "named": true
       },
       {
         "type": "parenthesized_predicate",
+        "named": true
+      },
+      {
+        "type": "predicate_application",
         "named": true
       },
       {
@@ -865,7 +865,7 @@
     "named": true,
     "fields": {
       "argument": {
-        "multiple": true,
+        "multiple": false,
         "required": true,
         "types": [
           {
@@ -1314,6 +1314,36 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "predicate_application",
+    "named": true,
+    "fields": {
+      "argument": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      },
+      "function": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "builtin",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {

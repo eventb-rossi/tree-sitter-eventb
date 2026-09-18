@@ -206,12 +206,12 @@ end
     (axioms_clause
       (axiom
         label: (label)
-        predicate: (function_application
+        predicate: (predicate_application
           function: (builtin)
           argument: (identifier)))
       (axiom
         label: (label)
-        predicate: (function_application
+        predicate: (predicate_application
           function: (builtin)
           argument: (identifier)
           argument: (identifier)

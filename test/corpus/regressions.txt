@@ -55,7 +55,7 @@ end
           right: (identifier)))
       (axiom
         label: (label)
-        predicate: (function_application
+        predicate: (predicate_application
           function: (builtin)
           argument: (identifier)))
       (axiom
@@ -437,3 +437,32 @@ end
               (identifier)
               (identifier))
             (identifier)))))))
+
+================================================================================
+the same application text is a predicate or an expression by position
+================================================================================
+
+context C
+  axioms
+    @a f(x)
+    @b f(x) = 1
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (context
+    (identifier)
+    (axioms_clause
+      (axiom
+        (label)
+        (predicate_application
+          (identifier)
+          (identifier)))
+      (axiom
+        (label)
+        (comparison_predicate
+          (function_application
+            (identifier)
+            (identifier))
+          (number))))))

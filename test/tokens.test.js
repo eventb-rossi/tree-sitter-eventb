@@ -190,8 +190,9 @@ test("every builtin spelling parses as a builtin node", () => {
       nodeTypes(root).has("builtin"),
       `expected ${JSON.stringify(spelling)} to produce a (builtin) node: ${root.toString()}`,
     );
-    // Builtins also apply to arguments: card(S), partition(S, A).
-    parseOk(`context C axioms @a x = ${spelling}(S, T) end`, spelling);
+    // Applied, with the one argument an expression application takes; the
+    // comma list belongs to predicate application (partition(S, A, B)).
+    parseOk(`context C axioms @a x = ${spelling}(S) end`, spelling);
   }
 });
 

@@ -141,6 +141,8 @@
 
 (function_application
   function: (identifier) @function)
+(predicate_application
+  function: (identifier) @function)
 (function_override
   function: (identifier) @function)
 

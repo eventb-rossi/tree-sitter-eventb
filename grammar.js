@@ -181,13 +181,12 @@ export default grammar({
   supertypes: ($) => [$._expression, $._predicate],
 
   conflicts: ($) => [
-    // An application can head a predicate (finite(S)) or an expression (the
-    // left of a comparison), so both readings stay alive until the
-    // continuation (a comparison operator, a postfix `(`/`{`/`[`, …) decides.
-    // The postfix-head readings need no declaration of their own: an item
-    // opens with its label, so a formula is never the first token of a clause
-    // member, and the automaton separates the heads on its own.
-    [$._predicate, $._expression],
+    // `f(` opens an expression application (a postfix head, then `(`) or a
+    // predicate application, and an item's label means a formula is never the
+    // first token of a clause member, so this is the only place the two
+    // readings meet. The argument list and what follows the `)` decide, so
+    // both stay alive until then.
+    [$._postfix_head, $.predicate_application],
     // In `{x, …` an identifier is either a comprehension binder or the first
     // element of a set enumeration (or the expression form's element).
     [$.typed_identifier, $._expression],
@@ -446,7 +445,7 @@ export default grammar({
         $.false,
         // Predicate application: finite(S), partition(S, A, B), and (like
         // rossi) any identifier applied to arguments.
-        $.function_application,
+        $.predicate_application,
       ),
 
     quantified_predicate: ($) =>
@@ -837,24 +836,40 @@ export default grammar({
         $.set_comprehension,
       ),
 
-    // Function/predicate application. Rossi's grammar.pest splits these:
-    // expression FUNIMAGE is single-argument (`f(x)`; a pair is `f(x ↦ y)`),
-    // while predicate application keeps a comma list (`partition(S, A, B)`).
-    // The same `id(args)` text is both an expression application and a
-    // predicate application, an overlap that resists a clean tree-sitter split,
-    // so this grammar uses one permissive multi-argument node in both
-    // positions. A multi-argument expression application (`f(a, b)`) therefore
-    // parses here though rossi rejects it — a parse-level check left to the
-    // language server, consistent with the grammar's permissiveness elsewhere.
+    // Expression application, single-argument like Rodin's FUNIMAGE: `f(x)`,
+    // with a pair written as a maplet `f(x ↦ y)`, never a comma list. Rodin's
+    // parser for it reads one expression and then demands `)`
+    // (`SubParsers.BinaryLedExprParser` over the singular `EXPR_PARSER`), and
+    // rossi's grammar.pest `function_application` does the same.
     function_application: ($) =>
       prec.left(
         EXPR.postfix,
         seq(
           field('function', $._postfix_head),
           '(',
-          commaSep1(field('argument', $._expression)),
+          field('argument', $._expression),
           ')',
         ),
+      ),
+
+    // Predicate application, where the comma list lives: `partition(S, A, B)`
+    // is Rodin's only multi-argument construct (`MultiplePredicate`, the sole
+    // user of `EXPR_LIST_PARSER`) and it is a predicate, not an expression.
+    // Like rossi's grammar.pest `predicate_application` the head is any
+    // identifier-shaped word, and which heads actually resolve is left to
+    // tooling (rossi answers with `BuiltinPredicate::from_name`).
+    //
+    // The same `f(x)` text is a predicate application here and an expression
+    // application in the left of a comparison. That is a positional
+    // difference, not one that needs types, so the `[$._postfix_head,
+    // $.predicate_application]` conflict above keeps both readings alive
+    // until the continuation decides, and `x = c(1, 2)` has no reading.
+    predicate_application: ($) =>
+      seq(
+        field('function', choice($.identifier, $._identifier_like, $.builtin)),
+        '(',
+        commaSep1(field('argument', $._expression)),
+        ')',
       ),
 
     parenthesized_expression: ($) => seq('(', $._expression, ')'),

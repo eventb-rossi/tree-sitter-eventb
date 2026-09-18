@@ -51,9 +51,9 @@ override `<+` (U+E103). Math and logic keywords are exact-case (uppercase
 structural keywords are case-insensitive.
 
 Parsing is permissive where the spec demands semantic checks (operator
-compatibility, non-associative chains, ∧/∨ mixing, single-argument
-application): those diagnostics belong to `eventb-language-server`, which also
-provides completion, outline, and folding over LSP.
+compatibility, non-associative chains, ∧/∨ mixing, application arity): those
+diagnostics belong to `eventb-language-server`, which also provides
+completion, outline, and folding over LSP.
 
 The grammar is validated against the rossi example models and every component
 from the `eventb-models-collection` corpus that rossi can import, render, and
