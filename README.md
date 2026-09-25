@@ -27,8 +27,8 @@ looser than the relation-set arrows and `⦂` (kernel_lang Table 3.1), so
   lists, and hyphenated Rodin component names (`ENV_C-1`).
 - **Events**: inline or `status`-clause convergence, `refines`/`extends`,
   `any` parameters, `where`/`when` guards, `with`/`witness` witnesses,
-  `then`/`begin` actions (`skip`, parallel `≔` incl. `f(x) ≔ E` override,
-  `:∈`, `:∣`), all with optional `@labels` and `theorem` flags.
+  `then`/`begin` actions (parallel `≔` incl. `f(x) ≔ E` override, `:∈`,
+  `:∣`), all with optional `@labels` and `theorem` flags.
 - **Predicates**: `⇔`/`⇒` (one precedence level) and `∨`/`∧` (one level),
   `¬`, `∀`/`∃` with typed binders, comparisons (non-associative by
   construction), `finite`/`partition` applications.

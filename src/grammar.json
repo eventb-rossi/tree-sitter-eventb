@@ -1057,10 +1057,6 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "skip"
-            },
-            {
-              "type": "SYMBOL",
               "name": "assignment"
             },
             {
@@ -1074,13 +1070,6 @@
           ]
         }
       ]
-    },
-    "skip": {
-      "type": "TOKEN",
-      "content": {
-        "type": "PATTERN",
-        "value": "[sS][kK][iI][pP]"
-      }
     },
     "assignment": {
       "type": "SEQ",
