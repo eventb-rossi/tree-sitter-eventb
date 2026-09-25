@@ -92,7 +92,7 @@ end
               right: (identifier))))))))
 
 ================================================================================
-when/begin spellings and skip
+when/begin spellings
 ================================================================================
 
 machine M
@@ -101,7 +101,7 @@ machine M
       when
         @grd1 x > 0
       begin
-        @act1 skip
+        @act1 x ≔ 0
     end
 end
 
@@ -122,7 +122,9 @@ end
         (then_clause
           (action
             label: (label)
-            (skip)))))))
+            (assignment
+              left: (identifier)
+              right: (number))))))))
 
 ================================================================================
 refinement: event refines/extends, witnesses, status

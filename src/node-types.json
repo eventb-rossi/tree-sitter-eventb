@@ -169,10 +169,6 @@
         {
           "type": "becomes_such",
           "named": true
-        },
-        {
-          "type": "skip",
-          "named": true
         }
       ]
     }
@@ -2469,10 +2465,6 @@
   {
     "type": "sets",
     "named": false
-  },
-  {
-    "type": "skip",
-    "named": true
   },
   {
     "type": "status",

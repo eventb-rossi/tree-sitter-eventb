@@ -10,7 +10,7 @@
 //
 // Design notes:
 // - Two keyword classes, following rossi's grammar.pest. STRUCTURAL keywords
-//   (context, machine, sees, event, then, end, theorem, skip, …) are
+//   (context, machine, sees, event, then, end, theorem, …) are
 //   case-insensitive: each is a regex token (via `ci`/`kw`) aliased to its
 //   canonical lowercase spelling, so queries match plain strings. MATH/logic
 //   keywords are exact-case, matching the kernel language — uppercase NAT,
@@ -489,10 +489,8 @@ export default grammar({
     action: ($) =>
       seq(
         field('label', $.label),
-        choice($.skip, $.assignment, $.becomes_member, $.becomes_such),
+        choice($.assignment, $.becomes_member, $.becomes_such),
       ),
-
-    skip: ($) => token(ci('skip')),
 
     // Deterministic (parallel) assignment x, y ≔ E, F and functional
     // override f(x) ≔ E. The assigned variables are identifiers (including

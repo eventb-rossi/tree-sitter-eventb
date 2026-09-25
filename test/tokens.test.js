@@ -139,7 +139,6 @@ const statusTemplates = {
   ordinary: "machine M events ordinary event e status ordinary end end",
   convergent: "machine M events convergent event e status convergent end end",
   anticipated: "machine M events anticipated event e status anticipated end end",
-  skip: "machine M events event e then @a skip end end",
   theorem: "machine M variables v invariants theorem @i v = 1 end",
 };
 
@@ -377,8 +376,8 @@ test("every canonical token the contract produces is highlighted", () => {
 });
 
 // The coverage test above only inspects ANONYMOUS tokens (operators, keywords
-// aliased to their canonical spelling). Named-node highlights — the (skip)
-// keyword, the boolean/set constants, the (builtin) functions, and the
+// aliased to their canonical spelling). Named-node highlights — the
+// boolean/set constants, the (builtin) functions, and the
 // INITIALISATION event painted as @keyword by a `#match?` rule — are invisible
 // to it, so pin the load-bearing ones here: a dropped @constant.builtin entry
 // or a broken INITIALISATION match would otherwise ship un-/mis-highlighted to
@@ -386,7 +385,6 @@ test("every canonical token the contract produces is highlighted", () => {
 // expected highlight name (a node may also carry the generic @variable, which
 // later patterns override — so this is membership, not equality).
 const namedHighlights = [
-  ["machine M events event e then @a skip end end", "skip", "keyword"],
   // INITIALISATION's node is a plain (identifier); the #match? rule adds @keyword.
   ["machine M events event INITIALISATION then @a v ≔ 1 end end", "identifier", "keyword"],
   ["context C axioms @a x = TRUE end", "bool_true", "constant.builtin"],
