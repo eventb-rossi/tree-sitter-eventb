@@ -31,7 +31,7 @@ END
         (identifier)))))
 
 ================================================================================
-Union and Inter as plain identifiers; union(S) as application
+Union and Inter as plain identifiers; union(S) as generalized union
 ================================================================================
 
 context C
@@ -62,9 +62,8 @@ end
         label: (label)
         predicate: (comparison_predicate
           left: (identifier)
-          right: (function_application
-            function: (identifier)
-            argument: (identifier))))
+          right: (closed_unary_expression
+            operand: (identifier))))
       (axiom
         label: (label)
         predicate: (comparison_predicate
@@ -321,18 +320,18 @@ end
             (number)))))))
 
 ================================================================================
-ASCII operator spellings and keyword-shaped words as identifiers
+case variants and keyword-shaped words as identifiers
 ================================================================================
 
 machine M
-  variables pow not
+  variables pow nothing
   invariants
     @i1 pow ∈ ℕ
   events
     event e any if where
       @g if > 0
     then
-      @a pow ≔ not + 1
+      @a pow ≔ nothing + 1
     end
 end
 

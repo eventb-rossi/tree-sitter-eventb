@@ -270,16 +270,14 @@ end
         label: (label)
         predicate: (comparison_predicate
           left: (identifier)
-          right: (function_application
-            function: (identifier)
-            argument: (identifier))))
+          right: (closed_unary_expression
+            operand: (identifier))))
       (axiom
         label: (label)
         predicate: (comparison_predicate
           left: (identifier)
-          right: (function_application
-            function: (identifier)
-            argument: (set_enumeration
+          right: (closed_unary_expression
+            operand: (set_enumeration
               (identifier)
               (identifier))))))))
 

@@ -234,6 +234,25 @@ test("a generic atom stands bare but still cannot name anything", () => {
   }
 });
 
+test("reserved word spellings cannot name mathematical identifiers", () => {
+  for (const word of [
+    "NAT", "NAT1", "INT", "UNION", "INTER", "true", "false", "circ", "not", "oftype",
+    "or", "POW", "POW1", "union", "inter",
+  ]) {
+    parseFails(`machine M variables ${word} end`, `${word} as a variable`);
+    parseFails(`machine M events event e then @a ${word} ≔ 0 end end`, `${word} as an assignment target`);
+  }
+  parseFails("context C sets NAT end", "NAT as a carrier set");
+  parseFails("context C constants POW end", "POW as a constant");
+  parseFails("machine M events event e any INT end end", "INT as a parameter");
+  parseFails("context C axioms @a ∀ NAT · NAT = NAT end", "NAT as a binder");
+  parseFails("machine M events event e then @a POW(x) ≔ 0 end end", "POW as a function target");
+  parseFails("machine M events event e then @a not(x) ≔ 0 end end", "not as a function target");
+  parseOk("machine M variables Nat pow end", "case variants as names");
+  parseOk("machine NAT events event POW end end", "component and event names");
+  parseOk("context C axioms @a x = union(S) ∪ inter(S) end", "generalized set operators");
+});
+
 // ---------------------------------------------------------------------------
 // Operators: each spelling is placed in a role-appropriate formula. An
 // error-free parse proves the spelling lexes as one operator token in that

@@ -663,6 +663,10 @@
             "named": false
           },
           {
+            "type": "inter",
+            "named": false
+          },
+          {
             "type": "max",
             "named": false
           },
@@ -672,6 +676,10 @@
           },
           {
             "type": "ran",
+            "named": false
+          },
+          {
+            "type": "union",
             "named": false
           }
         ]
@@ -2419,6 +2427,10 @@
     "named": true
   },
   {
+    "type": "inter",
+    "named": false
+  },
+  {
     "type": "invariants",
     "named": false
   },
@@ -2485,6 +2497,10 @@
   {
     "type": "true",
     "named": true
+  },
+  {
+    "type": "union",
+    "named": false
   },
   {
     "type": "variables",

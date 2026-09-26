@@ -98,13 +98,12 @@ function binaryLevel(level, left, right, operators) {
 }
 
 /**
- * A comma-separated assignment LHS: identifiers, including the operator-word
- * fallbacks (a variable may be named `dom`), plus any `extra` heads — the `≔`
+ * A comma-separated assignment LHS: identifiers, plus any `extra` heads — the `≔`
  * form also allows a `function_application` for `f(x) ≔ E`.
  */
 function assignTargets($, ...extra) {
   return commaSep1(
-    field('left', choice($.identifier, $._identifier_like, ...extra)),
+    field('left', choice($.identifier, ...extra)),
   );
 }
 
@@ -235,20 +234,11 @@ export default grammar({
   // elsewhere. This is what makes keywords reserved words.
   word: ($) => $.identifier,
 
-  // The kernel_lang §2.2 reserved words, which can never be an identifier —
-  // not bare in a formula and not as a declared name. Keyword extraction
-  // alone covers only the first half: where the word's own token is not
-  // valid, it would otherwise fall back to `identifier`, and `variables card`
-  // would parse. Rodin's `isValidIdentifierName` refuses exactly these
-  // spellings, exact case (`Dom`, `CARD`, `Union` are ordinary identifiers),
-  // and rossi's `is_reserved_word` mirrors it.
-  //
-  // `union` and `inter` are §2.2 words that this list leaves out on purpose:
-  // they name the generalized set operators, which neither this grammar nor
-  // rossi models, so reserving them would reject `union(S)`, which is
-  // Event-B. rossi's ASCII operator spellings (`circ`, `not`, `oftype`,
-  // `or`, `POW`, `POW1`) are absent for the opposite reason: they are this
-  // dialect's own extension and Rodin reads them as identifiers.
+  // Match rossi's `is_reserved_name` for mathematical identifiers. These
+  // exact-case spellings include Rodin's reserved words and rossi's ASCII
+  // operator aliases; `Nat`, `CARD`, and `pow` remain ordinary identifiers.
+  // Keyword extraction alone would let a keyword fall back to `identifier`
+  // where its own token is not valid, so `variables NAT` would parse.
   // A reserved word must name a token, so the words that share one token
   // (`builtin` is id/pred/prj1/prj2/succ, `_closed_predicate` is
   // finite/partition) are listed by their rule. The letter glyphs of the
@@ -264,6 +254,19 @@ export default grammar({
       'min',
       'mod',
       'ran',
+      'union',
+      'inter',
+      'NAT',
+      'NAT1',
+      'INT',
+      'UNION',
+      'INTER',
+      'circ',
+      'not',
+      'oftype',
+      'or',
+      'POW',
+      'POW1',
       'ℤ',
       'ℕ',
       'ℕ1',
@@ -274,12 +277,14 @@ export default grammar({
       $.bool_set,
       $.bool_true,
       $.bool_false,
+      $.true,
+      $.false,
     ],
 
     // Nothing is reserved in a component or event name. Those are Rodin file
     // names and labels, which `isValidIdentifierName` never sees: the model
     // corpus has a context named `partition` that machines `sees`, and rossi
-    // accepts it too, checking `is_reserved_word` only where a *mathematical*
+    // accepts it too, checking `is_reserved_name` only where a *mathematical*
     // identifier is being named.
     structural_name: (_) => [],
   },
@@ -670,10 +675,8 @@ export default grammar({
         $._identifier_like,
       ),
 
-    // `not` is one of rossi's ASCII operator spellings, not a word of the
-    // kernel language: Rodin is Unicode-only there (`¬`) and accepts `not` as
-    // an ordinary identifier, so rossi's `ASCII_OPERATOR_WORDS` leaves it
-    // usable as a name and this fallback keeps it parsing as one. GLR holds
+    // `not` is an ASCII operator spelling. This fallback preserves bare
+    // formula parsing where no negation operand follows. GLR holds
     // both readings until the continuation decides; the dynamic precedence on
     // `not_predicate` prefers the operator on ties, matching pest's
     // alternative order. The uppercase operators (POW, UNION, …) and the
@@ -881,16 +884,15 @@ export default grammar({
     // are Rodin's `CLOSED` operator group, whose `parseRight` opens with an
     // unconditional `acceptOpenParen()`, so the word is meaningless bare:
     // kernel_lang §3.3.3 calls them bounded, "always followed by a formula
-    // enclosed within parenthesis". `union`/`inter` belong to the group too,
-    // but neither this grammar nor rossi models the generalized set
-    // operators, so their spellings stay ordinary identifiers here.
+    // enclosed within parenthesis". `union`/`inter` are the generalized
+    // set operators.
     // Sits at postfix precedence as a postfix head so it binds like Rodin:
     // dom(f)(x) = (dom(f))(x), dom(f)∼ = (dom(f))∼.
     closed_unary_expression: ($) =>
       prec.left(
         EXPR.postfix,
         seq(
-          field('operator', choice('card', 'dom', 'max', 'min', 'ran')),
+          field('operator', choice('card', 'dom', 'max', 'min', 'ran', 'union', 'inter')),
           '(',
           field('operand', $._expression),
           ')',
@@ -1031,7 +1033,6 @@ export default grammar({
     _postfix_head: ($) =>
       choice(
         $.identifier,
-        $._identifier_like,
         $.builtin,
         $.number,
         $.bool_true,
@@ -1114,8 +1115,8 @@ export default grammar({
     bool_false: ($) => 'FALSE',
     // Number-set and BOOL type atoms — uppercase ASCII exact, matching the
     // kernel language; the Unicode forms are canonical. Each glyph and its
-    // ASCII spelling is its own token: the glyph is a reserved word (below)
-    // while the ASCII word may still name an identifier, as in rossi.
+    // ASCII spelling is its own token; both it and the glyph are reserved
+    // mathematical names.
     integer_set: (_) => choice('ℤ', alias('INT', 'ℤ')),
     natural_set: (_) => choice('ℕ', alias('NAT', 'ℕ')),
     natural1_set: (_) => choice('ℕ1', alias('NAT1', 'ℕ1')),
